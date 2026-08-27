@@ -3,9 +3,9 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "com.anonymous.mastPlayer",
+      "package_name": "com.mastplayer.in",
       "sha256_cert_fingerprints": [
-        "REPLACE_WITH_YOUR_RELEASE_OR_DEBUG_SHA256"
+        "A3:99:DC:98:1E:50:C0:67:63:43:6A:86:33:02:E1:E0:43:98:D5:89:9A:56:34:AB:3D:E1:51:BC:D6:69:6A:1A"
       ]
     }
   }

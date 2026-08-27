@@ -3,12 +3,12 @@
     "apps": [],
     "details": [
       {
-        "appID": "TEAMID.com.anonymous.mastPlayer",
+        "appID": "TEAMID.com.mastplayer.in",
         "paths": ["/v/*", "/v/*/*"]
       }
     ]
   },
   "webcredentials": {
-    "apps": ["TEAMID.com.anonymous.mastPlayer"]
+    "apps": ["TEAMID.com.mastplayer.in"]
   }
 }
