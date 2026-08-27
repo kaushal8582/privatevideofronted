@@ -1,4 +1,5 @@
 import { Link, Routes, Route } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import Navbar from './components/Navbar.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Landing from './pages/Landing.jsx';
@@ -48,6 +49,7 @@ export default function App() {
           </Link>
         </div>
       </footer>
+      <Analytics />
     </div>
   );
 }
