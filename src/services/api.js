@@ -27,7 +27,10 @@ api.interceptors.response.use(
   (error) => {
     if (error?.response?.status === 401) {
       const url = String(error?.config?.url || '');
-      const isAuthRoute = url.includes('/auth/login') || url.includes('/auth/register');
+      const isAuthRoute =
+        url.includes('/auth/login') ||
+        url.includes('/auth/register') ||
+        url.includes('/auth/google');
       if (!isAuthRoute && getStoredToken()) {
         setStoredToken(null);
         window.dispatchEvent(new Event('mastplayer:logout'));
@@ -53,7 +56,13 @@ export const register = (payload) => api.post('/auth/register', payload);
 
 export const login = (payload) => api.post('/auth/login', payload);
 
+export const loginWithGoogle = (idToken) => api.post('/auth/google', { idToken });
+
 export const fetchMe = () => api.get('/auth/me');
+
+export const updateMe = (payload) => api.patch('/auth/me', payload);
+
+export const fetchDashboardStats = () => api.get('/dashboard/stats');
 
 /** @deprecated Prefer uploadVideoChunked for production (avoids 413). */
 export const uploadVideo = (file, onUploadProgress, signal) => {

@@ -73,11 +73,11 @@ export default function BackgroundUploadPanel() {
               Open link
             </Link>
             <Link
-              to="/videos"
+              to="/studio/videos"
               onClick={clearJob}
               className="inline-flex items-center rounded-xl bg-teal-800 text-white px-3 py-2 text-xs font-medium hover:bg-teal-700"
             >
-              My Videos
+              Studio videos
             </Link>
           </div>
         </div>
@@ -87,7 +87,7 @@ export default function BackgroundUploadPanel() {
         <div className="px-4 pb-4 space-y-2">
           <p className="text-xs text-red-700">{job.error}</p>
           <Link
-            to="/upload"
+            to="/studio/upload"
             onClick={clearJob}
             className="inline-flex text-xs font-semibold text-teal-800 hover:underline"
           >

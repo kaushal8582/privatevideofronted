@@ -3,8 +3,10 @@ import {
   fetchMe,
   getStoredToken,
   login as apiLogin,
+  loginWithGoogle as apiGoogle,
   register as apiRegister,
   setStoredToken,
+  updateMe,
 } from '../services/api.js';
 
 const AuthContext = createContext(null);
@@ -61,6 +63,19 @@ export function AuthProvider({ children }) {
     return data.data.user;
   }, []);
 
+  const loginWithGoogle = useCallback(async (idToken) => {
+    const { data } = await apiGoogle(idToken);
+    setStoredToken(data.data.token);
+    setUser(data.data.user);
+    return data.data.user;
+  }, []);
+
+  const updateProfile = useCallback(async (payload) => {
+    const { data } = await updateMe(payload);
+    setUser(data.data.user);
+    return data.data.user;
+  }, []);
+
   const value = useMemo(
     () => ({
       user,
@@ -68,10 +83,12 @@ export function AuthProvider({ children }) {
       isAuthenticated: Boolean(user),
       login,
       register,
+      loginWithGoogle,
+      updateProfile,
       logout,
       refresh: bootstrap,
     }),
-    [user, loading, login, register, logout, bootstrap]
+    [user, loading, login, register, loginWithGoogle, updateProfile, logout, bootstrap]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

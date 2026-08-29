@@ -5,7 +5,7 @@ export default function EmptyState({
   title = 'No videos uploaded yet.',
   description = 'Upload your first video to get a shareable link.',
   actionLabel = 'Upload Video',
-  actionTo = '/upload',
+  actionTo = '/studio/upload',
 }) {
   return (
     <div className="rounded-2xl border border-dashed border-[#e6e1d8] bg-white/60 px-6 py-16 text-center">

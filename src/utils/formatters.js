@@ -30,6 +30,21 @@ export const formatDate = (dateInput) => {
   });
 };
 
+export const formatUsd = (amount) => {
+  const n = Number(amount) || 0;
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 4,
+  }).format(n);
+};
+
+export const formatCount = (n) => {
+  const v = Number(n) || 0;
+  return new Intl.NumberFormat('en-US').format(v);
+};
+
 export const getFileExtension = (filename = '') => {
   const parts = filename.split('.');
   return parts.length > 1 ? parts.pop().toUpperCase() : 'VIDEO';

@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "DM Sans", system-ui, sans-serif;
-  --font-display: "Instrument Serif", Georgia, serif;
-  --color-ink: #0c1222;
-  --color-ink-muted: #5b657a;
-  --color-surface: #f7f5f1;
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-display: "Syne", "Plus Jakarta Sans", system-ui, sans-serif;
+  --color-ink: #0b1f1c;
+  --color-ink-muted: #4a635e;
+  --color-surface: #f3f7f6;
   --color-surface-elevated: #ffffff;
-  --color-line: #e6e1d8;
+  --color-line: #d5e2de;
   --color-accent: #0f766e;
   --color-accent-hover: #0d9488;
   --color-accent-soft: #ccfbf1;
@@ -29,8 +29,8 @@ body {
   font-family: var(--font-sans);
   color: var(--color-ink);
   background:
-    radial-gradient(ellipse 80% 50% at 10% -10%, #d1fae5 0%, transparent 55%),
-    radial-gradient(ellipse 60% 40% at 100% 0%, #fef3c7 0%, transparent 50%),
+    radial-gradient(ellipse 70% 45% at 0% 0%, rgba(45, 212, 191, 0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 40% at 100% 0%, rgba(15, 118, 110, 0.1) 0%, transparent 50%),
     var(--color-surface);
   -webkit-font-smoothing: antialiased;
 }
@@ -47,11 +47,30 @@ body {
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(18px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes floatSoft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
   }
 }
 
@@ -62,7 +81,16 @@ body {
     opacity: 1;
   }
   50% {
-    transform: scale(1.06);
-    opacity: 0.85;
+    transform: scale(1.05);
+    opacity: 0.88;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
   }
 }

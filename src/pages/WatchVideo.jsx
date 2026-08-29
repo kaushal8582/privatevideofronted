@@ -4,6 +4,7 @@ import { ArrowLeft, Calendar, HardDrive, Play } from 'lucide-react';
 import CopyLinkButton from '../components/CopyLinkButton.jsx';
 import LoadingState from '../components/LoadingState.jsx';
 import { fetchVideoByShareToken, getFriendlyError } from '../services/api.js';
+import { trackAnalyticsEvent } from '../services/analytics.js';
 import {
   formatDate,
   formatDuration,
@@ -34,6 +35,11 @@ export default function WatchVideo() {
         const { data } = await fetchVideoByShareToken(shareToken);
         if (!cancelled) {
           setVideo(data.data);
+          trackAnalyticsEvent('link_open', {
+            shareToken,
+            path: `/v/${shareToken}`,
+            meta: { title: data.data?.title },
+          });
         }
       } catch (err) {
         if (cancelled) return;
@@ -58,6 +64,11 @@ export default function WatchVideo() {
     if (!shareToken || openingApp) return;
     setOpeningApp(true);
 
+    trackAnalyticsEvent('open_app_click', {
+      shareToken,
+      path: `/v/${shareToken}`,
+    });
+
     const deepLink = `mastplayer://v/${shareToken}`;
     const started = Date.now();
     let hidden = false;
@@ -76,6 +87,10 @@ export default function WatchVideo() {
       setOpeningApp(false);
       const elapsed = Date.now() - started;
       if (!hidden && elapsed >= 1400 && !document.hidden) {
+        trackAnalyticsEvent('play_store_redirect', {
+          shareToken,
+          path: `/v/${shareToken}`,
+        });
         window.location.href = PLAY_STORE_URL;
       }
     }, 1600);
@@ -87,7 +102,7 @@ export default function WatchVideo() {
 
   if (notFound) {
     return (
-      <div className="max-w-lg mx-auto text-center py-16">
+      <div className="max-w-lg mx-auto text-center py-16 px-4 sm:px-6">
         <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl mb-4">
           Video Not Found
         </h1>
@@ -107,7 +122,7 @@ export default function WatchVideo() {
 
   if (error) {
     return (
-      <div className="max-w-lg mx-auto text-center py-16">
+      <div className="max-w-lg mx-auto text-center py-16 px-4 sm:px-6">
         <h1 className="text-2xl font-semibold mb-3">Unable to load this video</h1>
         <p className="text-[#5b657a] mb-8">{error}</p>
         <Link
@@ -123,7 +138,7 @@ export default function WatchVideo() {
   const shareUrl = `${window.location.origin}/v/${shareToken}`;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
       <div className="min-w-0">
         <h1 className="text-2xl sm:text-3xl font-semibold break-words">{video.title}</h1>
         <p className="text-sm text-[#5b657a] mt-1 truncate">{video.originalName}</p>

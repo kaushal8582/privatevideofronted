@@ -4,7 +4,7 @@ const updated = 'August 26, 2026';
 
 export default function PrivacyPolicy() {
   return (
-    <article className="max-w-3xl mx-auto">
+    <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
       <header className="mb-10 sm:mb-12">
         <p className="text-sm font-semibold uppercase tracking-widest text-teal-800 mb-3">
           Legal
