@@ -2,6 +2,7 @@ import { Link, Routes, Route } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 import Navbar from './components/Navbar.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import BackgroundUploadPanel from './components/BackgroundUploadPanel.jsx';
 import Landing from './pages/Landing.jsx';
 import UploadPage from './pages/Upload.jsx';
 import Videos from './pages/Videos.jsx';
@@ -49,6 +50,7 @@ export default function App() {
           </Link>
         </div>
       </footer>
+      <BackgroundUploadPanel />
       <Analytics />
     </div>
   );
