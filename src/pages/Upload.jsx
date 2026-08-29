@@ -5,7 +5,8 @@ import toast from 'react-hot-toast';
 import UploadZone from '../components/UploadZone.jsx';
 import UploadProgress from '../components/UploadProgress.jsx';
 import CopyLinkButton from '../components/CopyLinkButton.jsx';
-import { uploadVideo, getFriendlyError } from '../services/api.js';
+import { getFriendlyError } from '../services/api.js';
+import { uploadVideoChunked } from '../services/chunkedUpload.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
 export default function UploadPage() {
@@ -39,7 +40,7 @@ export default function UploadPage() {
     abortRef.current = controller;
 
     try {
-      const { data } = await uploadVideo(
+      const data = await uploadVideoChunked(
         file,
         (event) => {
           if (!event.total) return;
@@ -53,7 +54,11 @@ export default function UploadPage() {
       toast.success('Video uploaded successfully!');
       setFile(null);
     } catch (err) {
-      if (err?.code === 'ERR_CANCELED' || err?.name === 'CanceledError') {
+      if (
+        err?.code === 'ERR_CANCELED' ||
+        err?.name === 'AbortError' ||
+        err?.name === 'CanceledError'
+      ) {
         setError('Upload cancelled.');
       } else {
         setError(getFriendlyError(err, 'Video upload failed. Please try again.'));
@@ -72,8 +77,8 @@ export default function UploadPage() {
           Upload &amp; Share
         </p>
         <p className="text-lg text-[#5b657a] max-w-lg mx-auto">
-          Hi{user?.name ? `, ${user.name}` : ''} — upload a video and get a public share link.
-          Only you will see it in My Videos.
+          Hi{user?.name ? `, ${user.name}` : ''} — large videos upload in chunks straight to
+          storage. Only you will see them in My Videos.
         </p>
       </section>
 
@@ -116,7 +121,7 @@ export default function UploadPage() {
           <div>
             <h2 className="text-2xl font-semibold mb-2">Upload Complete!</h2>
             <p className="text-[#5b657a]">
-              Anyone with this link can watch. It stays private in your library.
+              Anyone with this link can open it. Playback streams in the app.
             </p>
           </div>
 
@@ -136,7 +141,7 @@ export default function UploadPage() {
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#e6e1d8] bg-white px-4 py-2.5 text-sm font-medium hover:bg-[#f7f5f1] w-full sm:w-auto"
             >
               <ExternalLink className="w-4 h-4" />
-              Watch Video
+              Open link
             </Link>
           </div>
 

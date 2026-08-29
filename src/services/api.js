@@ -4,7 +4,7 @@ const TOKEN_KEY = 'mastplayer_token';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
-  timeout: 10 * 60 * 1000,
+  timeout: 30 * 60 * 1000,
 });
 
 export const getStoredToken = () => localStorage.getItem(TOKEN_KEY);
@@ -38,7 +38,15 @@ api.interceptors.response.use(
 );
 
 export const getFriendlyError = (error, fallback = 'Something went wrong.') => {
-  return error?.response?.data?.message || error?.message || fallback;
+  const status = error?.response?.status;
+  if (status === 413) {
+    return 'File too large for the server proxy. Use chunked upload or raise client_max_body_size.';
+  }
+  const data = error?.response?.data;
+  if (typeof data === 'string' && data.includes('413')) {
+    return 'File too large for the server proxy (413).';
+  }
+  return data?.message || error?.message || fallback;
 };
 
 export const register = (payload) => api.post('/auth/register', payload);
@@ -47,6 +55,7 @@ export const login = (payload) => api.post('/auth/login', payload);
 
 export const fetchMe = () => api.get('/auth/me');
 
+/** @deprecated Prefer uploadVideoChunked for production (avoids 413). */
 export const uploadVideo = (file, onUploadProgress, signal) => {
   const formData = new FormData();
   formData.append('video', file);
