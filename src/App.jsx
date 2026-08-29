@@ -43,7 +43,7 @@ export default function App() {
       </main>
       <footer className="border-t border-[#e6e1d8]/80 py-6">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-between gap-3 text-sm text-[#5b657a]">
-          <span>© {new Date().getFullYear()} mastPlayer</span>
+          <span>© {new Date().getFullYear()} Mast Player</span>
           <Link to="/privacy" className="text-teal-800 hover:text-teal-700 font-medium">
             Privacy Policy
           </Link>

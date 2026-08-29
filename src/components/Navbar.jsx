@@ -24,7 +24,7 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         <Link to="/" className="group flex items-baseline gap-2 min-w-0">
           <span className="font-[family-name:var(--font-display)] text-2xl sm:text-3xl tracking-tight text-[#0c1222] group-hover:text-teal-800 transition-colors">
-            mastPlayer
+            Mast Player
           </span>
         </Link>
 

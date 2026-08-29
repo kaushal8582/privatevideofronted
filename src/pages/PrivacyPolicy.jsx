@@ -13,8 +13,8 @@ export default function PrivacyPolicy() {
           Privacy Policy
         </h1>
         <p className="text-[#5b657a]">
-          For the <strong className="font-semibold text-[#0c1222]">mastPlayer</strong> mobile
-          app and related VideoShare web services at{' '}
+          For the <strong className="font-semibold text-[#0c1222]">Mast Player</strong> mobile
+          app and related web services at{' '}
           <a
             href="https://mastplayer.in"
             className="text-teal-800 underline underline-offset-2 hover:text-teal-700"
@@ -32,7 +32,7 @@ export default function PrivacyPolicy() {
             1. Overview
           </h2>
           <p>
-            mastPlayer is a video player that lets you browse and play videos stored on your
+            Mast Player is a video player that lets you browse and play videos stored on your
             device, and open shared video links from mastplayer.in. This policy explains what
             information we collect, how we use it, and your choices.
           </p>
@@ -96,7 +96,7 @@ export default function PrivacyPolicy() {
             4. Permissions
           </h2>
           <p className="mb-3">
-            Depending on your platform, mastPlayer may ask for:
+            Depending on your platform, Mast Player may ask for:
           </p>
           <ul className="list-disc pl-5 space-y-2">
             <li>
@@ -142,7 +142,7 @@ export default function PrivacyPolicy() {
             7. Children
           </h2>
           <p>
-            mastPlayer is not directed at children under 13. We do not knowingly collect personal
+            Mast Player is not directed at children under 13. We do not knowingly collect personal
             information from children. If you believe a child has provided data through our
             services, contact us and we will take appropriate steps.
           </p>
@@ -165,7 +165,7 @@ export default function PrivacyPolicy() {
           </h2>
           <p>
             We may update this Privacy Policy from time to time. The “Last updated” date at the
-            top will change when we do. Continued use of mastPlayer or mastplayer.in after an
+            top will change when we do. Continued use of Mast Player or mastplayer.in after an
             update means you accept the revised policy.
           </p>
         </section>
@@ -175,7 +175,7 @@ export default function PrivacyPolicy() {
             10. Contact
           </h2>
           <p>
-            Questions about this policy or mastPlayer privacy practices:{' '}
+            Questions about this policy or Mast Player privacy practices:{' '}
             <a
               href="mailto:privacy@mastplayer.in"
               className="text-teal-800 underline underline-offset-2 hover:text-teal-700"

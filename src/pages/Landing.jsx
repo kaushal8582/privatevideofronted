@@ -25,7 +25,7 @@ export default function Landing() {
 
         <div className="relative max-w-6xl mx-auto pt-16 sm:pt-24 pb-20 flex flex-col justify-center min-h-[min(92vh,880px)]">
           <p className="font-[family-name:var(--font-display)] text-5xl sm:text-7xl md:text-8xl tracking-tight text-[#0c1222] leading-[0.95] mb-6 max-w-3xl animate-[fadeUp_0.7s_ease-out_both]">
-            mastPlayer
+            Mast Player
           </p>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-medium text-[#0c1222]/90 max-w-xl mb-4 leading-snug animate-[fadeUp_0.7s_ease-out_0.08s_both]">
             Upload once. Share a link. Play anywhere.
@@ -86,7 +86,7 @@ export default function Landing() {
                   Your clip. One link.
                 </p>
                 <p className="mt-2 text-sm text-white/60 max-w-sm">
-                  Works in the browser and opens in the mastPlayer app.
+                  Open in the Mast Player app to watch.
                 </p>
               </div>
             </div>
@@ -114,7 +114,7 @@ export default function Landing() {
               {
                 icon: Link2,
                 title: 'Share',
-                body: 'Copy a public link. Anyone with it can watch — no account needed.',
+                  body: 'Copy a public link. Recipients open the preview page, then watch in Mast Player.',
               },
               {
                 icon: Shield,

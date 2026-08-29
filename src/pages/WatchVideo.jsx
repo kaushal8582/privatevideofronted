@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Calendar, HardDrive, ArrowLeft } from 'lucide-react';
-import VideoPlayer from '../components/VideoPlayer.jsx';
+import { ArrowLeft, Calendar, HardDrive, Play } from 'lucide-react';
 import CopyLinkButton from '../components/CopyLinkButton.jsx';
 import LoadingState from '../components/LoadingState.jsx';
 import { fetchVideoByShareToken, getFriendlyError } from '../services/api.js';
@@ -11,12 +10,16 @@ import {
   formatFileSize,
 } from '../utils/formatters.js';
 
+const PLAY_STORE_URL =
+  'https://play.google.com/store/apps/details?id=com.mastplayer.in';
+
 export default function WatchVideo() {
   const { shareToken } = useParams();
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState(null);
+  const [openingApp, setOpeningApp] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -50,6 +53,33 @@ export default function WatchVideo() {
       cancelled = true;
     };
   }, [shareToken]);
+
+  const openInApp = () => {
+    if (!shareToken || openingApp) return;
+    setOpeningApp(true);
+
+    const deepLink = `mastplayer://v/${shareToken}`;
+    const started = Date.now();
+    let hidden = false;
+
+    const onVisibility = () => {
+      if (document.hidden) hidden = true;
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
+    // Try custom scheme first (opens app details screen if installed)
+    window.location.href = deepLink;
+
+    // If app didn't take focus, send user to Play Store
+    window.setTimeout(() => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      setOpeningApp(false);
+      const elapsed = Date.now() - started;
+      if (!hidden && elapsed >= 1400 && !document.hidden) {
+        window.location.href = PLAY_STORE_URL;
+      }
+    }, 1600);
+  };
 
   if (loading) {
     return <LoadingState message="Loading video..." />;
@@ -91,29 +121,67 @@ export default function WatchVideo() {
   }
 
   const shareUrl = `${window.location.origin}/v/${shareToken}`;
-  const appDeepLink = `mastplayer://v/${shareToken}`;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-        <div className="min-w-0">
-          <h1 className="text-2xl sm:text-3xl font-semibold break-words">
-            {video.title}
-          </h1>
-          <p className="text-sm text-[#5b657a] mt-1 truncate">{video.originalName}</p>
-        </div>
-        <div className="flex flex-wrap gap-2 shrink-0">
-          <a
-            href={appDeepLink}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-800 text-white px-4 py-2.5 text-sm font-medium hover:bg-teal-700"
-          >
-            Open in App
-          </a>
-          <CopyLinkButton url={shareUrl} variant="secondary" />
-        </div>
+    <div className="max-w-3xl mx-auto space-y-6">
+      <div className="min-w-0">
+        <h1 className="text-2xl sm:text-3xl font-semibold break-words">{video.title}</h1>
+        <p className="text-sm text-[#5b657a] mt-1 truncate">{video.originalName}</p>
       </div>
 
-      <VideoPlayer src={video.videoUrl} title={video.title} />
+      {/* Thumbnail preview — no in-browser playback */}
+      <div className="relative aspect-video rounded-2xl overflow-hidden border border-[#e6e1d8] bg-[#0c1222] shadow-sm">
+        {video.thumbnailUrl ? (
+          <img
+            src={video.thumbnailUrl}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-teal-900 to-[#0c1222]" />
+        )}
+        <div className="absolute inset-0 bg-black/35" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4 text-center">
+          <button
+            type="button"
+            onClick={openInApp}
+            disabled={openingApp}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-teal-800 text-white px-7 py-3.5 text-base font-semibold hover:bg-teal-700 shadow-lg disabled:opacity-70"
+          >
+            <Play className="w-5 h-5 fill-white" />
+            {openingApp ? 'Opening…' : 'View in App'}
+          </button>
+          <p className="text-sm text-white/80 max-w-sm">
+            Open in Mast Player to watch. If the app isn’t installed, you’ll go to the Play Store.
+          </p>
+        </div>
+        {video.duration != null && (
+          <span className="absolute bottom-3 right-3 rounded-lg bg-black/70 text-white text-xs font-semibold px-2 py-1">
+            {formatDuration(video.duration)}
+          </span>
+        )}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={openInApp}
+          disabled={openingApp}
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-800 text-white px-5 py-2.5 text-sm font-medium hover:bg-teal-700 disabled:opacity-70"
+        >
+          <Play className="w-4 h-4 fill-white" />
+          {openingApp ? 'Opening…' : 'View in App'}
+        </button>
+        <a
+          href={PLAY_STORE_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center justify-center rounded-xl border border-[#e6e1d8] bg-white px-4 py-2.5 text-sm font-medium hover:bg-[#f7f5f1]"
+        >
+          Get Mast Player
+        </a>
+        <CopyLinkButton url={shareUrl} variant="secondary" />
+      </div>
 
       <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#5b657a]">
         <span className="inline-flex items-center gap-1.5">
