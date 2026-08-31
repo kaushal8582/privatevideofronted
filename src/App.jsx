@@ -15,6 +15,7 @@ import StudioVideos from './pages/studio/Videos.jsx';
 import StudioUpload from './pages/studio/Upload.jsx';
 import StudioProfile from './pages/studio/Profile.jsx';
 import StudioReferrals from './pages/studio/Referrals.jsx';
+import StudioOgEarn from './pages/studio/OgEarn.jsx';
 
 function MarketingShell() {
   return (
@@ -63,8 +64,9 @@ export default function App() {
           <Route index element={<StudioOverview />} />
           <Route path="videos" element={<StudioVideos />} />
           <Route path="upload" element={<StudioUpload />} />
-          <Route path="profile" element={<StudioProfile />} />
           <Route path="referrals" element={<StudioReferrals />} />
+          <Route path="og-earn" element={<StudioOgEarn />} />
+          <Route path="profile" element={<StudioProfile />} />
         </Route>
       </Routes>
       <BackgroundUploadPanel />

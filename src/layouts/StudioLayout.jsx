@@ -8,6 +8,7 @@ import {
   Menu,
   X,
   Gift,
+  Sparkles,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -18,6 +19,7 @@ const nav = [
   { to: '/studio/videos', label: 'Videos', icon: Video },
   { to: '/studio/upload', label: 'Upload', icon: Upload },
   { to: '/studio/referrals', label: 'Referrals', icon: Gift },
+  { to: '/studio/og-earn', label: 'OG Earn', icon: Sparkles },
   { to: '/studio/profile', label: 'Profile', icon: UserRound },
 ];
 

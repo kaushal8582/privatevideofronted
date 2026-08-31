@@ -75,6 +75,13 @@ export const fetchReferredUsers = () => api.get('/referrals/referred');
 export const fetchReferralCommissions = (page = 1, limit = 20) =>
   api.get('/referrals/commissions', { params: { page, limit } });
 
+export const convertOgEarnLink = (shareToken) =>
+  api.post('/og-earn/convert', { shareToken });
+
+export const fetchOgEarnSummary = () => api.get('/og-earn/me');
+
+export const fetchOgEarnLinks = () => api.get('/og-earn/links');
+
 /** @deprecated Prefer uploadVideoChunked for production (avoids 413). */
 export const uploadVideo = (file, onUploadProgress, signal) => {
   const formData = new FormData();
