@@ -1,22 +1,40 @@
-import { useCallback, useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext.jsx';
 import { getFriendlyError } from '../services/api.js';
 import GoogleSignInButton from '../components/GoogleSignInButton.jsx';
 
+const REF_STORAGE_KEY = 'mastplayer_ref';
+
 export default function Register() {
   const { register, loginWithGoogle, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  const referralCode = useMemo(() => {
+    const fromUrl = searchParams.get('ref')?.trim();
+    if (fromUrl) return fromUrl.toUpperCase();
+    return sessionStorage.getItem(REF_STORAGE_KEY) || '';
+  }, [searchParams]);
+
+  useEffect(() => {
+    const ref = searchParams.get('ref')?.trim();
+    if (ref) sessionStorage.setItem(REF_STORAGE_KEY, ref.toUpperCase());
+  }, [searchParams]);
+
   if (!loading && isAuthenticated) {
     return <Navigate to="/studio" replace />;
   }
+
+  const clearReferralStorage = () => {
+    sessionStorage.removeItem(REF_STORAGE_KEY);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,7 +45,9 @@ export default function Register() {
         name: name.trim(),
         email: email.trim(),
         password,
+        referralCode: referralCode || undefined,
       });
+      clearReferralStorage();
       toast.success('Account created!');
       navigate('/studio', { replace: true });
     } catch (err) {
@@ -42,7 +62,8 @@ export default function Register() {
       if (submitting) return;
       setSubmitting(true);
       try {
-        await loginWithGoogle(idToken);
+        await loginWithGoogle(idToken, referralCode || undefined);
+        clearReferralStorage();
         toast.success('Welcome!');
         navigate('/studio', { replace: true });
       } catch (err) {
@@ -51,36 +72,29 @@ export default function Register() {
         setSubmitting(false);
       }
     },
-    [loginWithGoogle, navigate, submitting]
+    [loginWithGoogle, navigate, referralCode, submitting]
   );
 
   return (
     <div className="max-w-md mx-auto px-4 sm:px-6 py-8 sm:py-12">
       <header className="mb-8 text-center">
-        <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl text-[#0c1222] mb-3">
-          Create account
-        </h1>
-        <p className="text-[#5b657a]">
-          Register to upload videos and manage your private library.
-        </p>
+        <h1 className="app-title mb-3">Create account</h1>
+        <p className="app-subtitle">Register to upload videos and manage your library.</p>
+        {referralCode ? (
+          <p className="mt-3 inline-flex items-center rounded-full border border-[var(--border-accent)] bg-[var(--accent-soft)] px-3 py-1 text-xs font-semibold text-[var(--blue)]">
+            Referred by code {referralCode}
+          </p>
+        ) : null}
       </header>
 
-      <div className="rounded-2xl border border-[#e6e1d8] bg-white p-6 sm:p-8 space-y-5 shadow-sm">
-        <GoogleSignInButton
-          onCredential={handleGoogle}
-          disabled={submitting}
-          text="signup_with"
-        />
+      <div className="app-card-padded space-y-5">
+        <GoogleSignInButton onCredential={handleGoogle} disabled={submitting} text="signup_with" />
 
-        <div className="flex items-center gap-3 text-xs uppercase tracking-wide text-[#5b657a]">
-          <span className="flex-1 h-px bg-[#e6e1d8]" />
-          or email
-          <span className="flex-1 h-px bg-[#e6e1d8]" />
-        </div>
+        <div className="app-divider">or email</div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <label className="block">
-            <span className="text-sm font-medium text-[#0c1222]">Name</span>
+          <label className="app-label">
+            Name
             <input
               type="text"
               required
@@ -88,24 +102,24 @@ export default function Register() {
               autoComplete="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-[#e6e1d8] bg-[#f7f5f1]/60 px-4 py-3 text-[#0c1222] outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-700/20"
+              className="app-input"
             />
           </label>
 
-          <label className="block">
-            <span className="text-sm font-medium text-[#0c1222]">Email</span>
+          <label className="app-label">
+            Email
             <input
               type="email"
               required
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-[#e6e1d8] bg-[#f7f5f1]/60 px-4 py-3 text-[#0c1222] outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-700/20"
+              className="app-input"
             />
           </label>
 
-          <label className="block">
-            <span className="text-sm font-medium text-[#0c1222]">Password</span>
+          <label className="app-label">
+            Password
             <input
               type="password"
               required
@@ -113,24 +127,20 @@ export default function Register() {
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-[#e6e1d8] bg-[#f7f5f1]/60 px-4 py-3 text-[#0c1222] outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-700/20"
+              className="app-input"
             />
-            <span className="mt-1 block text-xs text-[#5b657a]">At least 6 characters</span>
+            <span className="mt-1 block text-xs app-muted">At least 6 characters</span>
           </label>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full rounded-xl bg-teal-800 text-white px-5 py-3.5 text-base font-semibold hover:bg-teal-700 disabled:opacity-60"
-          >
+          <button type="submit" disabled={submitting} className="app-btn-primary app-btn-primary-lg w-full">
             {submitting ? 'Creating…' : 'Create account'}
           </button>
         </form>
       </div>
 
-      <p className="mt-6 text-center text-sm text-[#5b657a]">
+      <p className="mt-6 text-center text-sm app-muted">
         Already have an account?{' '}
-        <Link to="/login" className="font-semibold text-teal-800 hover:underline">
+        <Link to="/login" className="app-link">
           Log in
         </Link>
       </p>

@@ -61,7 +61,7 @@ export default function VideoThumbnail({ thumbnailUrl, videoUrl, title, classNam
   }
 
   return (
-    <div className={`absolute inset-0 flex items-center justify-center text-teal-800/40 ${className}`}>
+    <div className={`absolute inset-0 flex items-center justify-center text-[var(--primary)]/30 ${className}`}>
       <Film className="w-12 h-12" />
       <video ref={videoRef} className="hidden" />
     </div>

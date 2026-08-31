@@ -56,15 +56,20 @@ export function AuthProvider({ children }) {
     return data.data.user;
   }, []);
 
-  const register = useCallback(async ({ name, email, password }) => {
-    const { data } = await apiRegister({ name, email, password });
+  const register = useCallback(async ({ name, email, password, referralCode }) => {
+    const { data } = await apiRegister({
+      name,
+      email,
+      password,
+      ...(referralCode ? { referralCode } : {}),
+    });
     setStoredToken(data.data.token);
     setUser(data.data.user);
     return data.data.user;
   }, []);
 
-  const loginWithGoogle = useCallback(async (idToken) => {
-    const { data } = await apiGoogle(idToken);
+  const loginWithGoogle = useCallback(async (idToken, referralCode) => {
+    const { data } = await apiGoogle(idToken, referralCode);
     setStoredToken(data.data.token);
     setUser(data.data.user);
     return data.data.user;

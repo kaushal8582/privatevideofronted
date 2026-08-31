@@ -66,8 +66,8 @@ export default function UploadZone({
         className={[
           'relative rounded-2xl border-2 border-dashed px-6 py-12 sm:py-16 text-center cursor-pointer transition-all',
           dragActive
-            ? 'border-teal-700 bg-teal-50/80 scale-[1.01]'
-            : 'border-[#e6e1d8] bg-white/70 hover:border-teal-600/60 hover:bg-white',
+            ? 'border-[var(--primary)] bg-[var(--accent-soft)] scale-[1.01]'
+            : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--border-green)]',
           disabled ? 'opacity-60 pointer-events-none' : '',
         ].join(' ')}
       >
@@ -80,43 +80,33 @@ export default function UploadZone({
           onChange={(e) => handleFiles(e.target.files)}
         />
 
-        <div className="mx-auto w-14 h-14 rounded-2xl bg-teal-50 text-teal-800 flex items-center justify-center mb-5">
+        <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--accent-medium)] text-[var(--primary)] flex items-center justify-center mb-5">
           <Upload className="w-7 h-7" />
         </div>
 
-        <h2 className="text-xl sm:text-2xl font-semibold text-[#0c1222] mb-2">
-          Upload Video
-        </h2>
-        <p className="text-[#5b657a] mb-6">
+        <h2 className="text-xl sm:text-2xl font-semibold mb-2">Upload Video</h2>
+        <p className="app-muted mb-6">
           Drag &amp; drop your video
-          <span className="mx-2 text-[#c4bdb0]">or</span>
+          <span className="mx-2 opacity-50">or</span>
         </p>
 
-        <span className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-teal-800 text-white text-sm font-medium shadow-sm">
-          Choose Video
-        </span>
+        <span className="app-btn-primary inline-flex">Choose Video</span>
 
-        <p className="mt-6 text-sm text-[#5b657a]">
-          MP4, WebM, MOV, MKV · up to {MAX_MB} MB
-        </p>
+        <p className="mt-6 text-sm app-muted">MP4, WebM, MOV, MKV · up to {MAX_MB} MB</p>
       </div>
 
-      {localError && (
-        <p className="text-sm text-red-700 bg-red-50 border border-red-100 rounded-xl px-4 py-3">
-          {localError}
-        </p>
-      )}
+      {localError && <p className="app-error">{localError}</p>}
 
       {file && (
-        <div className="flex items-start gap-4 rounded-2xl border border-[#e6e1d8] bg-white p-4 sm:p-5">
-          <div className="shrink-0 w-11 h-11 rounded-xl bg-teal-50 text-teal-800 flex items-center justify-center">
+        <div className="flex items-start gap-4 app-card p-4 sm:p-5">
+          <div className="shrink-0 w-11 h-11 rounded-xl bg-[var(--accent-medium)] text-[var(--primary)] flex items-center justify-center">
             <Film className="w-5 h-5" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="font-medium truncate" title={file.name}>
               {file.name}
             </p>
-            <p className="text-sm text-[#5b657a] mt-1">
+            <p className="text-sm app-muted mt-1">
               {formatFileSize(file.size)} · {getFileExtension(file.name)}
               {file.type ? ` · ${file.type}` : ''}
             </p>
@@ -129,7 +119,7 @@ export default function UploadZone({
                 setLocalError(null);
                 onClear();
               }}
-              className="shrink-0 p-2 rounded-lg text-[#5b657a] hover:bg-slate-100 hover:text-[#0c1222] transition-colors"
+              className="shrink-0 p-2 rounded-lg app-muted hover:text-[var(--foreground)] hover:bg-[var(--surface-elevated)] transition-colors"
               aria-label="Remove selected file"
             >
               <X className="w-5 h-5" />

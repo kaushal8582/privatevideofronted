@@ -6,18 +6,14 @@ export default function ErrorState({
   onRetry,
 }) {
   return (
-    <div className="rounded-2xl border border-red-100 bg-red-50/60 px-6 py-12 text-center">
-      <div className="mx-auto w-12 h-12 rounded-xl bg-white text-red-700 flex items-center justify-center mb-4 shadow-sm">
+    <div className="app-card px-6 py-12 text-center border-[rgba(248,113,113,0.25)]">
+      <div className="mx-auto w-12 h-12 rounded-xl bg-[var(--danger-soft)] text-[var(--danger)] flex items-center justify-center mb-4">
         <AlertCircle className="w-6 h-6" />
       </div>
-      <h2 className="text-lg font-semibold text-[#0c1222] mb-2">{title}</h2>
-      <p className="text-[#5b657a] mb-6 max-w-md mx-auto">{message}</p>
+      <h2 className="text-lg font-semibold mb-2">{title}</h2>
+      <p className="app-muted mb-6 max-w-md mx-auto">{message}</p>
       {onRetry && (
-        <button
-          type="button"
-          onClick={onRetry}
-          className="inline-flex px-4 py-2.5 rounded-xl bg-teal-800 text-white text-sm font-medium hover:bg-teal-700"
-        >
+        <button type="button" onClick={onRetry} className="app-btn-primary">
           Try again
         </button>
       )}

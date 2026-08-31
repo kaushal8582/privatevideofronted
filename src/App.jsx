@@ -14,18 +14,19 @@ import StudioOverview from './pages/studio/Overview.jsx';
 import StudioVideos from './pages/studio/Videos.jsx';
 import StudioUpload from './pages/studio/Upload.jsx';
 import StudioProfile from './pages/studio/Profile.jsx';
+import StudioReferrals from './pages/studio/Referrals.jsx';
 
 function MarketingShell() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="app-shell min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1 w-full">
         <Outlet />
       </main>
-      <footer className="border-t border-[#d5e2de]/80 py-6">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-3 text-sm text-[#4a635e]">
-          <span>© {new Date().getFullYear()} Mast Player</span>
-          <Link to="/privacy" className="text-teal-800 hover:text-teal-700 font-medium">
+      <footer className="border-t border-[var(--border)] py-6">
+        <div className="app-container px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-3 text-sm app-muted">
+          <span>© {new Date().getFullYear()} MastPlayer</span>
+          <Link to="/privacy" className="app-link text-sm">
             Privacy Policy
           </Link>
         </div>
@@ -38,8 +39,9 @@ export default function App() {
   return (
     <>
       <Routes>
+        <Route path="/" element={<Landing />} />
+
         <Route element={<MarketingShell />}>
-          <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
@@ -62,6 +64,7 @@ export default function App() {
           <Route path="videos" element={<StudioVideos />} />
           <Route path="upload" element={<StudioUpload />} />
           <Route path="profile" element={<StudioProfile />} />
+          <Route path="referrals" element={<StudioReferrals />} />
         </Route>
       </Routes>
       <BackgroundUploadPanel />

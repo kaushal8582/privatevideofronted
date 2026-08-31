@@ -54,42 +54,30 @@ export default function Login() {
   return (
     <div className="max-w-md mx-auto px-4 sm:px-6 py-8 sm:py-12">
       <header className="mb-8 text-center">
-        <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl text-[#0c1222] mb-3">
-          Log in
-        </h1>
-        <p className="text-[#5b657a]">
-          Access your uploads and create new share links.
-        </p>
+        <h1 className="app-title mb-3">Log in</h1>
+        <p className="app-subtitle">Access your uploads and create new share links.</p>
       </header>
 
-      <div className="rounded-2xl border border-[#e6e1d8] bg-white p-6 sm:p-8 space-y-5 shadow-sm">
-        <GoogleSignInButton
-          onCredential={handleGoogle}
-          disabled={submitting}
-          text="signin_with"
-        />
+      <div className="app-card-padded space-y-5">
+        <GoogleSignInButton onCredential={handleGoogle} disabled={submitting} text="signin_with" />
 
-        <div className="flex items-center gap-3 text-xs uppercase tracking-wide text-[#5b657a]">
-          <span className="flex-1 h-px bg-[#e6e1d8]" />
-          or email
-          <span className="flex-1 h-px bg-[#e6e1d8]" />
-        </div>
+        <div className="app-divider">or email</div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <label className="block">
-            <span className="text-sm font-medium text-[#0c1222]">Email</span>
+          <label className="app-label">
+            Email
             <input
               type="email"
               required
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-[#e6e1d8] bg-[#f7f5f1]/60 px-4 py-3 text-[#0c1222] outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-700/20"
+              className="app-input"
             />
           </label>
 
-          <label className="block">
-            <span className="text-sm font-medium text-[#0c1222]">Password</span>
+          <label className="app-label">
+            Password
             <input
               type="password"
               required
@@ -97,23 +85,19 @@ export default function Login() {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-[#e6e1d8] bg-[#f7f5f1]/60 px-4 py-3 text-[#0c1222] outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-700/20"
+              className="app-input"
             />
           </label>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full rounded-xl bg-teal-800 text-white px-5 py-3.5 text-base font-semibold hover:bg-teal-700 disabled:opacity-60"
-          >
+          <button type="submit" disabled={submitting} className="app-btn-primary app-btn-primary-lg w-full">
             {submitting ? 'Signing in…' : 'Log in'}
           </button>
         </form>
       </div>
 
-      <p className="mt-6 text-center text-sm text-[#5b657a]">
+      <p className="mt-6 text-center text-sm app-muted">
         New here?{' '}
-        <Link to="/register" className="font-semibold text-teal-800 hover:underline">
+        <Link to="/register" className="app-link">
           Create an account
         </Link>
       </p>

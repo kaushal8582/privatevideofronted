@@ -6,12 +6,36 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0b1f1c" />
-    <title>Mast Player — Share videos. Watch in app. Earn from views.</title>
+    <meta name="theme-color" content="#070b14" />
+    <script>
+      (function () {
+        var t = localStorage.getItem('mastplayer-theme');
+        document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', t === 'light' ? '#ffffff' : '#070b14');
+      })();
+    </script>
+    <title>MastPlayer — Upload, Share &amp; Monetize Your Videos</title>
     <meta
       name="description"
-      content="Upload videos, share a link, and let viewers watch in the Mast Player app. App views count toward your creator earnings."
+      content="Upload videos, create shareable links, manage your content and reach viewers anywhere with MastPlayer."
     />
+    <link rel="canonical" href="https://mastplayer.in/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mastplayer.in/" />
+    <meta property="og:title" content="MastPlayer — Upload, Share &amp; Monetize Your Videos" />
+    <meta
+      property="og:description"
+      content="Upload videos, create shareable links, manage your content and reach viewers anywhere with MastPlayer."
+    />
+    <meta property="og:image" content="https://mastplayer.in/icon-192.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="MastPlayer — Upload, Share &amp; Monetize Your Videos" />
+    <meta
+      name="twitter:description"
+      content="Upload videos, create shareable links, manage your content and reach viewers anywhere with MastPlayer."
+    />
+    <meta name="twitter:image" content="https://mastplayer.in/icon-192.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

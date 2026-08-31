@@ -56,13 +56,24 @@ export const register = (payload) => api.post('/auth/register', payload);
 
 export const login = (payload) => api.post('/auth/login', payload);
 
-export const loginWithGoogle = (idToken) => api.post('/auth/google', { idToken });
+export const loginWithGoogle = (idToken, referralCode) =>
+  api.post('/auth/google', {
+    idToken,
+    ...(referralCode ? { referralCode } : {}),
+  });
 
 export const fetchMe = () => api.get('/auth/me');
 
 export const updateMe = (payload) => api.patch('/auth/me', payload);
 
 export const fetchDashboardStats = () => api.get('/dashboard/stats');
+
+export const fetchReferralSummary = () => api.get('/referrals/me');
+
+export const fetchReferredUsers = () => api.get('/referrals/referred');
+
+export const fetchReferralCommissions = (page = 1, limit = 20) =>
+  api.get('/referrals/commissions', { params: { page, limit } });
 
 /** @deprecated Prefer uploadVideoChunked for production (avoids 413). */
 export const uploadVideo = (file, onUploadProgress, signal) => {

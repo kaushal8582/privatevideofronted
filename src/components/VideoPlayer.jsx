@@ -1,14 +1,14 @@
 export default function VideoPlayer({ src, title, poster }) {
   if (!src) {
     return (
-      <div className="aspect-video rounded-2xl bg-[#0c1222] flex items-center justify-center text-white/70">
+      <div className="aspect-video rounded-2xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center app-muted">
         No video source
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-full overflow-hidden rounded-2xl bg-black shadow-lg ring-1 ring-black/10">
+    <div className="w-full max-w-full overflow-hidden rounded-2xl bg-black border border-[var(--border-green)]">
       <video
         key={src}
         controls

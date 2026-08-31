@@ -86,7 +86,7 @@ export default function GoogleSignInButton({
 
   if (unavailable) {
     return (
-      <p className="text-center text-xs text-[#5b657a]">
+      <p className="text-center text-xs app-muted">
         Google sign-in is not configured yet. Set <code>VITE_GOOGLE_CLIENT_ID</code>.
       </p>
     );
@@ -100,7 +100,7 @@ export default function GoogleSignInButton({
         aria-label="Continue with Google"
       />
       {!ready && (
-        <p className="text-xs text-[#5b657a]">Loading Google…</p>
+        <p className="text-xs app-muted">Loading Google…</p>
       )}
     </div>
   );

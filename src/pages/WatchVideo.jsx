@@ -78,10 +78,8 @@ export default function WatchVideo() {
     };
     document.addEventListener('visibilitychange', onVisibility);
 
-    // Try custom scheme first (opens app details screen if installed)
     window.location.href = deepLink;
 
-    // If app didn't take focus, send user to Play Store
     window.setTimeout(() => {
       document.removeEventListener('visibilitychange', onVisibility);
       setOpeningApp(false);
@@ -103,16 +101,11 @@ export default function WatchVideo() {
   if (notFound) {
     return (
       <div className="max-w-lg mx-auto text-center py-16 px-4 sm:px-6">
-        <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl mb-4">
-          Video Not Found
-        </h1>
-        <p className="text-[#5b657a] mb-8">
+        <h1 className="app-title mb-4">Video Not Found</h1>
+        <p className="app-muted mb-8">
           This video may have been deleted or the link may be invalid.
         </p>
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-800 text-white text-sm font-medium hover:bg-teal-700"
-        >
+        <Link to="/" className="app-btn-primary">
           <ArrowLeft className="w-4 h-4" />
           Back to Home
         </Link>
@@ -124,11 +117,8 @@ export default function WatchVideo() {
     return (
       <div className="max-w-lg mx-auto text-center py-16 px-4 sm:px-6">
         <h1 className="text-2xl font-semibold mb-3">Unable to load this video</h1>
-        <p className="text-[#5b657a] mb-8">{error}</p>
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-800 text-white text-sm font-medium hover:bg-teal-700"
-        >
+        <p className="app-muted mb-8">{error}</p>
+        <Link to="/" className="app-btn-primary">
           Back to Home
         </Link>
       </div>
@@ -141,11 +131,10 @@ export default function WatchVideo() {
     <div className="max-w-3xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
       <div className="min-w-0">
         <h1 className="text-2xl sm:text-3xl font-semibold break-words">{video.title}</h1>
-        <p className="text-sm text-[#5b657a] mt-1 truncate">{video.originalName}</p>
+        <p className="text-sm app-muted mt-1 truncate">{video.originalName}</p>
       </div>
 
-      {/* Thumbnail preview — no in-browser playback */}
-      <div className="relative aspect-video rounded-2xl overflow-hidden border border-[#e6e1d8] bg-[#0c1222] shadow-sm">
+      <div className="relative aspect-video rounded-2xl overflow-hidden border border-[var(--border-green)] bg-[var(--surface)]">
         {video.thumbnailUrl ? (
           <img
             src={video.thumbnailUrl}
@@ -153,7 +142,7 @@ export default function WatchVideo() {
             className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-teal-900 to-[#0c1222]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0d120f] to-[var(--background)]" />
         )}
         <div className="absolute inset-0 bg-black/35" />
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4 text-center">
@@ -161,7 +150,7 @@ export default function WatchVideo() {
             type="button"
             onClick={openInApp}
             disabled={openingApp}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-teal-800 text-white px-7 py-3.5 text-base font-semibold hover:bg-teal-700 shadow-lg disabled:opacity-70"
+            className="inline-flex items-center justify-center gap-2 rounded-full app-btn-primary app-btn-primary-lg !rounded-full shadow-[0_0_32px_var(--glow-cyan)] disabled:opacity-70"
           >
             <Play className="w-5 h-5 fill-white" />
             {openingApp ? 'Opening…' : 'View in App'}
@@ -182,23 +171,18 @@ export default function WatchVideo() {
           type="button"
           onClick={openInApp}
           disabled={openingApp}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-800 text-white px-5 py-2.5 text-sm font-medium hover:bg-teal-700 disabled:opacity-70"
+          className="app-btn-primary disabled:opacity-70"
         >
           <Play className="w-4 h-4 fill-white" />
           {openingApp ? 'Opening…' : 'View in App'}
         </button>
-        <a
-          href={PLAY_STORE_URL}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center justify-center rounded-xl border border-[#e6e1d8] bg-white px-4 py-2.5 text-sm font-medium hover:bg-[#f7f5f1]"
-        >
+        <a href={PLAY_STORE_URL} target="_blank" rel="noreferrer" className="app-btn-secondary">
           Get Mast Player
         </a>
         <CopyLinkButton url={shareUrl} variant="secondary" />
       </div>
 
-      <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#5b657a]">
+      <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm app-muted">
         <span className="inline-flex items-center gap-1.5">
           <HardDrive className="w-4 h-4" />
           {formatFileSize(video.size)}

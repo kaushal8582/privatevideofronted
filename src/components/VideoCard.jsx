@@ -12,8 +12,11 @@ export default function VideoCard({ video, onDelete, deleting = false }) {
   const watchPath = `/v/${video.shareToken}`;
 
   return (
-    <article className="group flex flex-col rounded-2xl border border-[#e6e1d8] bg-white overflow-hidden shadow-sm hover:shadow-md hover:border-teal-700/20 transition-all">
-      <Link to={watchPath} className="relative aspect-video bg-[#ece7df] overflow-hidden block">
+    <article className="group flex flex-col app-card overflow-hidden hover:border-[var(--border-green)] transition-colors">
+      <Link
+        to={watchPath}
+        className="relative aspect-video bg-[var(--surface)] overflow-hidden block"
+      >
         <VideoThumbnail
           thumbnailUrl={video.thumbnailUrl}
           videoUrl={video.videoUrl}
@@ -27,15 +30,15 @@ export default function VideoCard({ video, onDelete, deleting = false }) {
 
       <div className="flex flex-col flex-1 p-4 gap-3">
         <div className="min-w-0">
-          <h3 className="font-semibold text-[#0c1222] truncate" title={video.title}>
+          <h3 className="font-semibold truncate" title={video.title}>
             {video.title}
           </h3>
-          <p className="text-sm text-[#5b657a] truncate mt-0.5" title={video.originalName}>
+          <p className="text-sm app-muted truncate mt-0.5" title={video.originalName}>
             {video.originalName}
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#5b657a]">
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs app-muted">
           <span className="inline-flex items-center gap-1">
             <HardDrive className="w-3.5 h-3.5" />
             {formatFileSize(video.size)}
@@ -49,16 +52,13 @@ export default function VideoCard({ video, onDelete, deleting = false }) {
           ) : null}
         </div>
 
-        <p className="text-xs text-[#5b657a] break-all line-clamp-2" title={video.shareUrl}>
+        <p className="text-xs app-muted break-all line-clamp-2" title={video.shareUrl}>
           {video.shareUrl}
         </p>
 
         <div className="mt-auto pt-1 flex flex-wrap gap-2">
-          <Link
-            to={watchPath}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-teal-800 text-white text-sm font-medium hover:bg-teal-700"
-          >
-            <Play className="w-3.5 h-3.5" />
+          <Link to={watchPath} className="app-btn-primary !py-2 !px-3 !text-sm">
+            <Play className="w-3.5 h-3.5 fill-white" />
             Watch
           </Link>
           <CopyLinkButton url={video.shareUrl} variant="secondary" className="!py-2 !px-3" />
@@ -66,7 +66,7 @@ export default function VideoCard({ video, onDelete, deleting = false }) {
             type="button"
             onClick={() => onDelete?.(video)}
             disabled={deleting}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-red-700 text-sm font-medium hover:bg-red-50 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-[var(--danger)] hover:bg-[var(--danger-soft)] disabled:opacity-50"
           >
             <Trash2 className="w-3.5 h-3.5" />
             Delete
