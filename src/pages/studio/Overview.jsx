@@ -129,7 +129,7 @@ export default function StudioOverview() {
               icon={BadgeCheck}
               label="Payable views"
               value={formatCount(stats.payableViews)}
-              hint="≥20s, 1 / device / day"
+              hint="≥1 min watch, 1 / device / day"
               accent="emerald"
             />
             <StatCard
