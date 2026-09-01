@@ -16,9 +16,6 @@ import {
   formatDuration,
   formatFileSize,
 } from '../utils/formatters.js';
-import AdsterraBanner from '../components/ads/AdsterraBanner.jsx';
-import AdsterraPageScript from '../components/ads/AdsterraPageScript.jsx';
-import { ADSTERRA_ENABLED } from '../config/adsterra.js';
 
 const PLAY_STORE_URL =
   'https://play.google.com/store/apps/details?id=com.mastplayer.in';
@@ -176,21 +173,6 @@ export default function WatchVideo() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-      {ADSTERRA_ENABLED ? (
-        <>
-          <AdsterraPageScript type="socialBar" />
-          <AdsterraPageScript type="popunder" />
-        </>
-      ) : null}
-
-      {/* Top banner — mobile 320x50, desktop 728x90 */}
-      <div className="sm:hidden">
-        <AdsterraBanner unit="banner320x50" />
-      </div>
-      <div className="hidden sm:block">
-        <AdsterraBanner unit="banner728x90" />
-      </div>
-
       <div className="min-w-0">
         <h1 className="text-2xl sm:text-3xl font-semibold break-words">{video.title}</h1>
         <p className="text-sm app-muted mt-1 truncate">{video.originalName}</p>
@@ -230,9 +212,6 @@ export default function WatchVideo() {
           </span>
         )}
       </div>
-
-      {/* Mid banner after video */}
-      <AdsterraBanner unit="banner300x250" />
 
       <div className="flex flex-wrap items-center gap-3">
         <button
@@ -311,14 +290,6 @@ export default function WatchVideo() {
           <Calendar className="w-4 h-4" />
           {formatDate(video.createdAt)}
         </span>
-      </div>
-
-      {/* Bottom banner */}
-      <div className="sm:hidden">
-        <AdsterraBanner unit="banner320x50" />
-      </div>
-      <div className="hidden sm:block">
-        <AdsterraBanner unit="banner300x250" />
       </div>
     </div>
   );
