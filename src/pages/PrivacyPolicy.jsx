@@ -170,10 +170,10 @@ export default function PrivacyPolicy() {
           <p>
             Questions about this policy or Mast Player privacy practices:{' '}
             <a
-              href="mailto:privacy@mastplayer.in"
+              href="mailto:support@mastplayer.in"
               className="app-link underline underline-offset-2"
             >
-              privacy@mastplayer.in
+              support@mastplayer.in
             </a>
             .
           </p>

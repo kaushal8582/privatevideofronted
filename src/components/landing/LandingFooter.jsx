@@ -42,7 +42,14 @@ export default function LandingFooter() {
             <p className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)] mb-4">Company</p>
             <ul className="space-y-2">
               <li><FooterText>About</FooterText></li>
-              <li><FooterText>Contact</FooterText></li>
+              <li>
+                <a
+                  href="mailto:support@mastplayer.in"
+                  className="text-sm text-[var(--muted)] hover:text-[var(--primary)] transition-colors"
+                >
+                  Contact
+                </a>
+              </li>
             </ul>
           </div>
 

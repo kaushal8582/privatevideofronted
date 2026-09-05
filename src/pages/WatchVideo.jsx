@@ -270,16 +270,6 @@ export default function WatchVideo() {
         </div>
       )}
 
-      {isOriginalCreator && (
-        <p className="text-sm app-muted">
-          This is your upload. Share your original link, or check{' '}
-          <Link to="/studio/og-earn" className="app-link">
-            OG Earn royalties
-          </Link>{' '}
-          when others remap it.
-        </p>
-      )}
-
       <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm app-muted">
         <span className="inline-flex items-center gap-1.5">
           <HardDrive className="w-4 h-4" />
