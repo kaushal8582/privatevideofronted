@@ -16,6 +16,7 @@ import StudioUpload from './pages/studio/Upload.jsx';
 import StudioProfile from './pages/studio/Profile.jsx';
 import StudioReferrals from './pages/studio/Referrals.jsx';
 import StudioOgEarn from './pages/studio/OgEarn.jsx';
+import StudioTelegram from './pages/studio/Telegram.jsx';
 
 function MarketingShell() {
   return (
@@ -66,6 +67,7 @@ export default function App() {
           <Route path="upload" element={<StudioUpload />} />
           <Route path="referrals" element={<StudioReferrals />} />
           <Route path="og-earn" element={<StudioOgEarn />} />
+          <Route path="telegram" element={<StudioTelegram />} />
           <Route path="profile" element={<StudioProfile />} />
         </Route>
       </Routes>

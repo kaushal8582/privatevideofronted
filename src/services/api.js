@@ -82,6 +82,22 @@ export const fetchOgEarnSummary = () => api.get('/og-earn/me');
 
 export const fetchOgEarnLinks = () => api.get('/og-earn/links');
 
+export const createTelegramConnectCode = () => api.post('/telegram/connect/code');
+
+export const fetchTelegramDestinations = () => api.get('/telegram/destinations');
+
+export const updateTelegramDestinationSettings = (id, settings) =>
+  api.patch(`/telegram/destinations/${id}/settings`, settings);
+
+export const disconnectTelegramDestination = (id) =>
+  api.delete(`/telegram/destinations/${id}`);
+
+export const fetchTelegramPublications = (videoId) =>
+  api.get(`/telegram/publications/${videoId}`);
+
+export const retryTelegramPublication = (id) =>
+  api.post(`/telegram/publications/${id}/retry`);
+
 /** @deprecated Prefer uploadVideoChunked for production (avoids 413). */
 export const uploadVideo = (file, onUploadProgress, signal) => {
   const formData = new FormData();

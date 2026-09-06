@@ -70,7 +70,7 @@ export function UploadQueueProvider({ children }) {
   }, [releaseWakeLock]);
 
   const startUpload = useCallback(
-    async (file) => {
+    async (file, options = {}) => {
       if (!file) return { started: false, reason: 'No file' };
       if (job.status === 'uploading') {
         return { started: false, reason: 'An upload is already running in the background.' };
@@ -102,7 +102,12 @@ export function UploadQueueProvider({ children }) {
               prev.status === 'uploading' ? { ...prev, progress } : prev
             );
           },
-          controller.signal
+          controller.signal,
+          {
+            telegramDestinationIds: options.telegramDestinationIds || [],
+            title: options.title || '',
+            thumbnailFile: options.thumbnailFile || null,
+          }
         );
 
         setJob({

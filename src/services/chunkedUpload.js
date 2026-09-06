@@ -65,6 +65,49 @@ export function readLocalVideoMeta(file) {
   });
 }
 
+/**
+ * Convert an image File/Blob to JPEG for R2 thumbnail upload.
+ */
+export function imageFileToJpegBlob(file, maxEdge = 1280, quality = 0.85) {
+  return new Promise((resolve) => {
+    if (!file) {
+      resolve(null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      try {
+        let { width, height } = img;
+        const scale = Math.min(1, maxEdge / Math.max(width, height));
+        width = Math.max(1, Math.round(width * scale));
+        height = Math.max(1, Math.round(height * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            URL.revokeObjectURL(objectUrl);
+            resolve(blob);
+          },
+          'image/jpeg',
+          quality
+        );
+      } catch {
+        URL.revokeObjectURL(objectUrl);
+        resolve(null);
+      }
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(null);
+    };
+    img.src = objectUrl;
+  });
+}
+
 async function uploadPart(url, blob, signal) {
   const res = await fetch(url, {
     method: 'PUT',
@@ -90,13 +133,20 @@ async function uploadPart(url, blob, signal) {
  * Chunked direct upload to R2 via presigned URLs.
  * Bypasses API reverse-proxy body size limits (413).
  */
-export async function uploadVideoChunked(file, onProgress, signal) {
+export async function uploadVideoChunked(file, onProgress, signal, options = {}) {
+  const telegramDestinationIds = Array.isArray(options.telegramDestinationIds)
+    ? options.telegramDestinationIds
+    : [];
+  const customTitle = String(options.title || '').trim();
+  const customThumbnailFile = options.thumbnailFile || null;
+
   const { data: initRes } = await api.post(
     '/videos/upload/init',
     {
       filename: file.name,
       mimeType: file.type || 'video/mp4',
       size: file.size,
+      ...(customTitle ? { title: customTitle.slice(0, 120) } : {}),
     },
     { signal }
   );
@@ -147,10 +197,18 @@ export async function uploadVideoChunked(file, onProgress, signal) {
     const meta = await readLocalVideoMeta(file);
     let hasThumbnail = false;
 
-    if (meta.thumbnailBlob && thumbnailUploadUrl) {
+    let thumbBlob = null;
+    if (customThumbnailFile) {
+      thumbBlob = await imageFileToJpegBlob(customThumbnailFile);
+    }
+    if (!thumbBlob) {
+      thumbBlob = meta.thumbnailBlob;
+    }
+
+    if (thumbBlob && thumbnailUploadUrl) {
       const thumbRes = await fetch(thumbnailUploadUrl, {
         method: 'PUT',
-        body: meta.thumbnailBlob,
+        body: thumbBlob,
         headers: { 'Content-Type': 'image/jpeg' },
         signal,
       });
@@ -164,6 +222,7 @@ export async function uploadVideoChunked(file, onProgress, signal) {
         parts: completed.sort((a, b) => a.partNumber - b.partNumber),
         duration: meta.duration,
         hasThumbnail,
+        telegramDestinationIds,
       },
       { signal }
     );

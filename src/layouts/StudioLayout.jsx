@@ -9,6 +9,7 @@ import {
   X,
   Gift,
   Sparkles,
+  MessageCircle,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -20,6 +21,7 @@ const nav = [
   { to: '/studio/upload', label: 'Upload', icon: Upload },
   { to: '/studio/referrals', label: 'Referrals', icon: Gift },
   { to: '/studio/og-earn', label: 'OG Earn', icon: Sparkles },
+  { to: '/studio/telegram', label: 'Telegram', icon: MessageCircle },
   { to: '/studio/profile', label: 'Profile', icon: UserRound },
 ];
 
