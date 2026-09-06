@@ -152,7 +152,7 @@ export default function StudioReferrals() {
           icon={Gift}
           label="Pending balance"
           value={formatUsd(summary.referralBalanceUsd)}
-          hint="Paid when payout system is enabled"
+          hint="Withdraw from Studio → Payouts"
         />
         <StatCard
           icon={Gift}

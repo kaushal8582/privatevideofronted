@@ -98,6 +98,21 @@ export const fetchTelegramPublications = (videoId) =>
 export const retryTelegramPublication = (id) =>
   api.post(`/telegram/publications/${id}/retry`);
 
+export const fetchPayoutWallet = () => api.get('/payouts/wallet');
+
+export const updatePayoutMethods = (payload) => api.patch('/payouts/methods', payload);
+
+export const requestPayout = (payload) => api.post('/payouts/request', payload);
+
+export const fetchPayoutHistory = (page = 1, limit = 20) =>
+  api.get('/payouts/history', { params: { page, limit } });
+
+export const adminFetchPayouts = (status = 'pending', page = 1, limit = 20) =>
+  api.get('/admin/payouts', { params: { status, page, limit } });
+
+export const adminProcessPayout = (id, payload) =>
+  api.patch(`/admin/payouts/${id}`, payload);
+
 /** @deprecated Prefer uploadVideoChunked for production (avoids 413). */
 export const uploadVideo = (file, onUploadProgress, signal) => {
   const formData = new FormData();

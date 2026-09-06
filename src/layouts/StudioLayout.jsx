@@ -10,17 +10,20 @@ import {
   Gift,
   Sparkles,
   MessageCircle,
+  Wallet,
+  Shield,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 
-const nav = [
+const baseNav = [
   { to: '/studio', end: true, label: 'Overview', icon: LayoutDashboard },
   { to: '/studio/videos', label: 'Videos', icon: Video },
   { to: '/studio/upload', label: 'Upload', icon: Upload },
   { to: '/studio/referrals', label: 'Referrals', icon: Gift },
   { to: '/studio/og-earn', label: 'OG Earn', icon: Sparkles },
+  { to: '/studio/payouts', label: 'Payouts', icon: Wallet },
   { to: '/studio/telegram', label: 'Telegram', icon: MessageCircle },
   { to: '/studio/profile', label: 'Profile', icon: UserRound },
 ];
@@ -37,6 +40,16 @@ export default function StudioLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const nav = useMemo(() => {
+    if (user?.role === 'admin') {
+      return [
+        ...baseNav,
+        { to: '/studio/admin/payouts', label: 'Admin payouts', icon: Shield },
+      ];
+    }
+    return baseNav;
+  }, [user?.role]);
 
   const handleLogout = () => {
     logout();
