@@ -1,6 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, ExternalLink, ImagePlus, MessageCircle, Upload, X } from 'lucide-react';
+import {
+  Check,
+  ExternalLink,
+  ImagePlus,
+  MessageCircle,
+  RefreshCw,
+  Upload,
+  X,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import UploadZone from '../../components/UploadZone.jsx';
 import UploadProgress from '../../components/UploadProgress.jsx';
@@ -9,6 +17,8 @@ import { useUploadQueue } from '../../context/UploadQueueContext.jsx';
 import {
   fetchTelegramDestinations,
   fetchTelegramPublications,
+  getFriendlyError,
+  retryTelegramPublication,
 } from '../../services/api.js';
 
 function formatMembers(n) {
@@ -37,6 +47,7 @@ export default function StudioUpload() {
   const [sendToTelegram, setSendToTelegram] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [publications, setPublications] = useState([]);
+  const [retryingId, setRetryingId] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -91,6 +102,49 @@ export default function StudioUpload() {
       clearInterval(id);
     };
   }, [job.status, job.result?.id]);
+
+  const handleRetryTelegram = async (publicationId) => {
+    if (!publicationId || retryingId) return;
+    setRetryingId(publicationId);
+    setPublications((prev) =>
+      prev.map((p) =>
+        p.id === publicationId ? { ...p, status: 'publishing', error: null } : p
+      )
+    );
+    try {
+      const { data } = await retryTelegramPublication(publicationId);
+      const next = data.data;
+      setPublications((prev) =>
+        prev.map((p) =>
+          p.id === publicationId
+            ? {
+                ...p,
+                status: next.status,
+                error: next.error || null,
+                publishedAt: next.publishedAt || p.publishedAt,
+              }
+            : p
+        )
+      );
+      if (next.status === 'published') {
+        toast.success('Telegram publish succeeded');
+      } else {
+        toast.error(next.error || 'Telegram publish failed again');
+      }
+    } catch (err) {
+      toast.error(getFriendlyError(err, 'Retry failed'));
+      try {
+        if (job.result?.id) {
+          const { data } = await fetchTelegramPublications(job.result.id);
+          setPublications(data.data || []);
+        }
+      } catch {
+        /* ignore */
+      }
+    } finally {
+      setRetryingId(null);
+    }
+  };
 
   const titlePlaceholder = useMemo(
     () => (file ? deriveDefaultTitle(file.name) || 'Video title' : 'Video title'),
@@ -415,28 +469,52 @@ export default function StudioUpload() {
               <p className="text-xs font-semibold uppercase tracking-wide app-muted">
                 Telegram
               </p>
-              <ul className="grid gap-2 sm:grid-cols-2">
+              <ul className="space-y-2">
                 {publications.map((p) => (
                   <li
                     key={p.id}
-                    className="flex items-center justify-between gap-2 rounded-xl border border-[var(--border)] px-3 py-2.5 text-sm"
+                    className="rounded-xl border border-[var(--border)] px-3 py-2.5 text-sm space-y-1.5"
                   >
-                    <span className="truncate">{p.destination?.title || 'Destination'}</span>
-                    <span
-                      className={
-                        p.status === 'published'
-                          ? 'text-[var(--primary)] font-medium shrink-0'
-                          : p.status === 'failed'
-                            ? 'text-[var(--danger,#ef4444)] font-medium shrink-0'
-                            : 'app-muted shrink-0'
-                      }
-                    >
-                      {p.status === 'published'
-                        ? 'Published'
-                        : p.status === 'failed'
-                          ? 'Failed'
-                          : 'Publishing…'}
-                    </span>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="truncate font-medium">
+                        {p.destination?.title || 'Destination'}
+                      </span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span
+                          className={
+                            p.status === 'published'
+                              ? 'text-[var(--primary)] font-medium'
+                              : p.status === 'failed'
+                                ? 'text-[var(--danger,#ef4444)] font-medium'
+                                : 'app-muted'
+                          }
+                        >
+                          {p.status === 'published'
+                            ? 'Published'
+                            : p.status === 'failed'
+                              ? 'Failed'
+                              : 'Publishing…'}
+                        </span>
+                        {p.status === 'failed' ? (
+                          <button
+                            type="button"
+                            disabled={retryingId === p.id}
+                            onClick={() => handleRetryTelegram(p.id)}
+                            className="app-btn-secondary !px-2.5 !py-1 text-xs"
+                          >
+                            <RefreshCw
+                              className={`w-3.5 h-3.5 ${retryingId === p.id ? 'animate-spin' : ''}`}
+                            />
+                            {retryingId === p.id ? 'Retrying…' : 'Retry'}
+                          </button>
+                        ) : null}
+                      </div>
+                    </div>
+                    {p.status === 'failed' && p.error ? (
+                      <p className="text-xs text-[var(--danger,#ef4444)] break-words">
+                        {p.error}
+                      </p>
+                    ) : null}
                   </li>
                 ))}
               </ul>
