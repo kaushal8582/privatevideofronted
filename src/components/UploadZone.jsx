@@ -49,7 +49,7 @@ export default function UploadZone({
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {!file ? (
         <div
           role="button"
@@ -65,10 +65,10 @@ export default function UploadZone({
           onDragLeave={onDragLeave}
           onClick={() => !disabled && inputRef.current?.click()}
           className={[
-            'relative flex flex-wrap items-center justify-center gap-3 rounded-xl border border-dashed px-4 py-5 text-center cursor-pointer transition-colors',
+            'relative flex flex-col sm:flex-row sm:items-center gap-4 rounded-2xl border-2 border-dashed px-5 py-8 sm:py-10 cursor-pointer transition-all',
             dragActive
-              ? 'border-[var(--primary)] bg-[var(--accent-soft)]'
-              : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--border-green)]',
+              ? 'border-[var(--primary)] bg-[var(--accent-soft)] scale-[1.005]'
+              : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--border-accent)] hover:bg-[var(--surface-elevated)]',
             disabled ? 'opacity-60 pointer-events-none' : '',
           ].join(' ')}
         >
@@ -80,18 +80,25 @@ export default function UploadZone({
             disabled={disabled}
             onChange={(e) => handleFiles(e.target.files)}
           />
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--accent-medium)] text-[var(--primary)]">
-            <Upload className="w-4 h-4" />
+          <span className="mx-auto sm:mx-0 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent-medium)] text-[var(--primary)] shrink-0">
+            <Upload className="w-5 h-5" />
           </span>
-          <div className="text-left min-w-0">
-            <p className="text-sm font-semibold">Drop video or click to choose</p>
-            <p className="text-xs app-muted">MP4, WebM, MOV, MKV · up to {MAX_MB} MB</p>
+          <div className="text-center sm:text-left min-w-0 flex-1">
+            <p className="text-base font-semibold text-[var(--foreground)]">
+              Drop your video here
+            </p>
+            <p className="mt-1 text-sm app-muted">
+              or click to browse · MP4, WebM, MOV, MKV · up to {MAX_MB} MB
+            </p>
           </div>
+          <span className="app-btn-primary self-center sm:self-auto shrink-0 pointer-events-none">
+            Choose file
+          </span>
         </div>
       ) : (
         <div
           className={[
-            'flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2',
+            'flex items-center gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3.5',
             disabled ? 'opacity-60' : '',
           ].join(' ')}
           onDrop={onDrop}
@@ -106,23 +113,23 @@ export default function UploadZone({
             disabled={disabled}
             onChange={(e) => handleFiles(e.target.files)}
           />
-          <div className="shrink-0 w-8 h-8 rounded-lg bg-[var(--accent-medium)] text-[var(--primary)] flex items-center justify-center">
-            <Film className="w-4 h-4" />
+          <div className="shrink-0 w-11 h-11 rounded-xl bg-[var(--accent-medium)] text-[var(--primary)] flex items-center justify-center">
+            <Film className="w-5 h-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium truncate" title={file.name}>
+            <p className="text-sm font-semibold truncate" title={file.name}>
               {file.name}
             </p>
-            <p className="text-xs app-muted">
+            <p className="text-xs app-muted mt-0.5">
               {formatFileSize(file.size)} · {getFileExtension(file.name)}
             </p>
           </div>
           {!disabled && (
-            <>
+            <div className="flex items-center gap-1 shrink-0">
               <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
-                className="shrink-0 text-xs app-link"
+                className="app-btn-secondary !px-3 !py-1.5 text-xs"
               >
                 Change
               </button>
@@ -133,12 +140,12 @@ export default function UploadZone({
                   setLocalError(null);
                   onClear();
                 }}
-                className="shrink-0 p-1.5 rounded-md app-muted hover:text-[var(--foreground)] hover:bg-[var(--surface-elevated)]"
+                className="p-2 rounded-lg app-muted hover:text-[var(--foreground)] hover:bg-[var(--surface-elevated)]"
                 aria-label="Remove selected file"
               >
                 <X className="w-4 h-4" />
               </button>
-            </>
+            </div>
           )}
         </div>
       )}

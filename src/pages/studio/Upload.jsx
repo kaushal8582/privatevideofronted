@@ -93,7 +93,7 @@ export default function StudioUpload() {
   }, [job.status, job.result?.id]);
 
   const titlePlaceholder = useMemo(
-    () => (file ? deriveDefaultTitle(file.name) || 'Title' : 'Title'),
+    () => (file ? deriveDefaultTitle(file.name) || 'Video title' : 'Video title'),
     [file]
   );
 
@@ -162,39 +162,54 @@ export default function StudioUpload() {
   const showSuccessOnPage = job.status === 'success' && job.result;
 
   return (
-    <div className="w-full space-y-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-xl font-semibold tracking-tight">Upload</h1>
+    <div className="w-full max-w-5xl space-y-5">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="app-kicker mb-1">Creator Studio</p>
+          <h1 className="app-title text-2xl sm:text-3xl">Upload video</h1>
+        </div>
         {isUploading ? (
-          <span className="text-xs font-medium text-[var(--primary)]">
+          <span className="rounded-full border border-[var(--border-accent)] bg-[var(--accent-soft)] px-3 py-1 text-xs font-semibold text-[var(--primary)]">
             Uploading {job.progress}%
           </span>
         ) : null}
       </div>
 
       {isUploading && (
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2 space-y-2">
+        <div className="app-card p-4 space-y-3">
+          <p className="text-sm font-medium text-[var(--foreground)]">
+            Upload running in the background
+          </p>
           <UploadProgress progress={job.progress} />
-          <Link to="/studio/videos" className="app-link text-xs">
-            Go to Videos →
+          <Link to="/studio/videos" className="app-link text-sm inline-flex">
+            Continue in Videos →
           </Link>
         </div>
       )}
 
       {!showSuccessOnPage && (
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--card,var(--surface-elevated))] p-3 sm:p-4 space-y-3">
-          <UploadZone
-            file={file}
-            onFileSelect={onFileSelect}
-            onClear={() => setFile(null)}
-            disabled={isUploading}
-          />
+        <div className="space-y-4">
+          <section className="app-card p-4 sm:p-5">
+            <UploadZone
+              file={file}
+              onFileSelect={onFileSelect}
+              onClear={() => setFile(null)}
+              disabled={isUploading}
+            />
+          </section>
 
           {file ? (
-            <div className="grid gap-3 lg:grid-cols-2 lg:items-start">
-              <div className="space-y-3">
+            <section className="grid gap-4 lg:grid-cols-5">
+              <div className="app-card p-4 sm:p-5 space-y-4 lg:col-span-3">
+                <div>
+                  <h2 className="text-sm font-semibold text-[var(--foreground)]">Details</h2>
+                  <p className="text-xs app-muted mt-0.5">
+                    Title is shown on watch pages and Telegram. Thumbnail is optional.
+                  </p>
+                </div>
+
                 <label className="block">
-                  <span className="mb-1 block text-xs font-medium app-muted">Title</span>
+                  <span className="app-label">Title</span>
                   <input
                     type="text"
                     value={title}
@@ -202,187 +217,247 @@ export default function StudioUpload() {
                     placeholder={titlePlaceholder}
                     onChange={(e) => setTitle(e.target.value)}
                     disabled={isUploading}
-                    className="app-input !mt-0 !py-2 text-sm"
+                    className="app-input"
                   />
+                  <span className="mt-1 block text-xs app-muted text-right">
+                    {title.length}/120
+                  </span>
                 </label>
 
-                <div className="flex items-center gap-2">
-                  <div className="w-24 aspect-video shrink-0 rounded-lg overflow-hidden border border-[var(--border)] bg-[var(--surface)] flex items-center justify-center">
-                    {thumbnailPreview ? (
-                      <img
-                        src={thumbnailPreview}
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-[10px] leading-tight app-muted px-1 text-center">
-                        Auto · frame 60
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex flex-wrap gap-1.5 min-w-0">
-                    <label className="app-btn-secondary !px-2.5 !py-1.5 text-xs cursor-pointer">
-                      <ImagePlus className="w-3.5 h-3.5" />
-                      {thumbnailFile ? 'Change' : 'Thumbnail'}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        disabled={isUploading}
-                        onChange={onThumbnailSelect}
-                      />
-                    </label>
-                    {thumbnailFile ? (
-                      <button
-                        type="button"
-                        disabled={isUploading}
-                        onClick={() => setThumbnailFile(null)}
-                        className="app-btn-ghost !px-2 !py-1.5 text-xs"
-                        aria-label="Remove thumbnail"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    ) : null}
+                <div>
+                  <p className="app-label mb-2">Thumbnail</p>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <div className="w-36 sm:w-40 aspect-video rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--surface)] flex items-center justify-center shrink-0">
+                      {thumbnailPreview ? (
+                        <img
+                          src={thumbnailPreview}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-xs app-muted px-3 text-center leading-snug">
+                          Auto from ~frame 60
+                        </span>
+                      )}
+                    </div>
+                    <div className="space-y-2 min-w-0">
+                      <label className="app-btn-secondary cursor-pointer inline-flex">
+                        <ImagePlus className="w-4 h-4" />
+                        {thumbnailFile ? 'Change image' : 'Upload image'}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          disabled={isUploading}
+                          onChange={onThumbnailSelect}
+                        />
+                      </label>
+                      {thumbnailFile ? (
+                        <button
+                          type="button"
+                          disabled={isUploading}
+                          onClick={() => setThumbnailFile(null)}
+                          className="flex items-center gap-1.5 text-sm app-link"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                          Use auto thumbnail
+                        </button>
+                      ) : (
+                        <p className="text-xs app-muted max-w-[14rem]">
+                          Skip to auto-capture a frame from the video.
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-2 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-2.5">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="flex items-center gap-1.5 text-sm font-medium">
-                    <MessageCircle className="w-3.5 h-3.5 text-[var(--primary)]" />
-                    Telegram
-                  </span>
+              <div className="app-card p-4 sm:p-5 space-y-3 lg:col-span-2 flex flex-col">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="text-sm font-semibold flex items-center gap-2">
+                      <MessageCircle className="w-4 h-4 text-[var(--primary)]" />
+                      Telegram
+                    </h2>
+                    <p className="text-xs app-muted mt-0.5">Publish after upload</p>
+                  </div>
                   <button
                     type="button"
                     role="switch"
                     aria-checked={sendToTelegram}
                     disabled={isUploading || destinations.length === 0}
                     onClick={() => setSendToTelegram((v) => !v)}
-                    className={`relative h-5 w-9 shrink-0 rounded-full transition-colors disabled:opacity-50 ${
+                    className={`relative h-6 w-11 shrink-0 rounded-full transition-colors disabled:opacity-50 ${
                       sendToTelegram ? 'bg-[var(--gradient-brand-h)]' : 'bg-[var(--border)]'
                     }`}
                   >
                     <span
-                      className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${
-                        sendToTelegram ? 'translate-x-4' : ''
+                      className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                        sendToTelegram ? 'translate-x-5' : ''
                       }`}
                     />
                   </button>
                 </div>
 
-                {destinations.length === 0 ? (
-                  <p className="text-xs app-muted">
-                    None connected.{' '}
-                    <Link to="/studio/telegram" className="app-link">
-                      Connect
-                    </Link>
-                  </p>
-                ) : sendToTelegram ? (
-                  <ul className="grid gap-1 sm:grid-cols-2">
-                    {destinations.map((d) => {
-                      const checked = selectedIds.includes(d.id);
-                      return (
-                        <li key={d.id}>
-                          <label className="flex items-center gap-2 rounded-md border border-[var(--border)] px-2 py-1.5 cursor-pointer hover:border-[var(--border-accent)]">
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={() => toggleDest(d.id)}
-                              disabled={isUploading}
-                              className="shrink-0"
-                            />
-                            <span className="min-w-0 truncate text-xs">
-                              <span className="font-medium">{d.title}</span>
-                              <span className="app-muted">
-                                {' '}
-                                · {d.type}
-                                {formatMembers(d.memberCount)
-                                  ? ` · ${formatMembers(d.memberCount)}`
-                                  : ''}
+                <div className="flex-1 min-h-0">
+                  {destinations.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-[var(--border)] px-3 py-4 text-sm app-muted">
+                      No destinations yet.{' '}
+                      <Link to="/studio/telegram" className="app-link">
+                        Connect Telegram
+                      </Link>
+                    </div>
+                  ) : sendToTelegram ? (
+                    <ul className="space-y-2 max-h-52 overflow-y-auto pr-0.5">
+                      {destinations.map((d) => {
+                        const checked = selectedIds.includes(d.id);
+                        return (
+                          <li key={d.id}>
+                            <label
+                              className={[
+                                'flex items-start gap-3 rounded-xl border px-3 py-2.5 cursor-pointer transition-colors',
+                                checked
+                                  ? 'border-[var(--border-accent)] bg-[var(--accent-soft)]'
+                                  : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--border-accent)]',
+                              ].join(' ')}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={() => toggleDest(d.id)}
+                                disabled={isUploading}
+                                className="mt-0.5 shrink-0"
+                              />
+                              <span className="min-w-0">
+                                <span className="block text-sm font-medium truncate">
+                                  {d.title}
+                                </span>
+                                <span className="text-xs app-muted capitalize">
+                                  {d.type}
+                                  {formatMembers(d.memberCount)
+                                    ? ` · ${formatMembers(d.memberCount)}`
+                                    : ''}
+                                  {d.settings?.autoPublish ? ' · Auto' : ''}
+                                </span>
                               </span>
-                            </span>
-                          </label>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                ) : (
-                  <p className="text-xs app-muted">Off — won’t post after upload.</p>
-                )}
+                            </label>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : (
+                    <p className="text-sm app-muted rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-3">
+                      Turn on to post this video to your groups or channels.
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
+            </section>
           ) : null}
 
-          {localError && <p className="app-error text-sm">{localError}</p>}
-          {job.status === 'error' && job.error && (
-            <p className="app-error text-sm">{job.error}</p>
-          )}
+          {localError && <p className="app-error">{localError}</p>}
+          {job.status === 'error' && job.error && <p className="app-error">{job.error}</p>}
 
           {file && !isUploading && (
-            <button
-              type="button"
-              onClick={handleUpload}
-              className="app-btn-primary w-full sm:w-auto !px-4 !py-2 text-sm"
-            >
-              <Upload className="w-4 h-4" />
-              {sendToTelegram && selectedIds.length ? 'Upload & publish' : 'Upload'}
-            </button>
+            <div className="sticky bottom-3 z-10">
+              <div className="app-card flex flex-wrap items-center justify-between gap-3 px-4 py-3 shadow-lg border-[var(--border-accent)]">
+                <p className="text-sm app-muted min-w-0 truncate">
+                  Ready ·{' '}
+                  <span className="text-[var(--foreground)] font-medium">
+                    {title.trim() || titlePlaceholder}
+                  </span>
+                  {sendToTelegram && selectedIds.length
+                    ? ` · ${selectedIds.length} Telegram`
+                    : ''}
+                </p>
+                <button
+                  type="button"
+                  onClick={handleUpload}
+                  className="app-btn-primary shrink-0"
+                >
+                  <Upload className="w-4 h-4" />
+                  {sendToTelegram && selectedIds.length ? 'Upload & publish' : 'Start upload'}
+                </button>
+              </div>
+            </div>
           )}
         </div>
       )}
 
       {showSuccessOnPage && (
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--card,var(--surface-elevated))] p-3 sm:p-4 space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--accent-medium)] text-[var(--primary)]">
-              <Check className="w-4 h-4" />
+        <section className="app-card p-5 sm:p-6 space-y-5">
+          <div className="flex items-start gap-3">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--accent-medium)] text-[var(--primary)] shrink-0">
+              <Check className="w-5 h-5" />
             </span>
-            <p className="text-sm font-semibold">Upload complete</p>
+            <div>
+              <h2 className="text-lg font-semibold">Upload complete</h2>
+              <p className="text-sm app-muted mt-0.5">
+                Share the link — viewers watch in the app.
+              </p>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2.5 py-2">
-            <p className="min-w-0 flex-1 text-xs break-all text-[var(--primary)] font-medium">
-              {job.result.shareUrl}
-            </p>
-            <CopyLinkButton url={job.result.shareUrl} className="!px-2.5 !py-1.5 text-xs shrink-0" />
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold uppercase tracking-wide app-muted mb-1">
+                Share link
+              </p>
+              <p className="text-sm break-all font-medium text-[var(--primary)]">
+                {job.result.shareUrl}
+              </p>
+            </div>
+            <CopyLinkButton url={job.result.shareUrl} className="shrink-0" />
           </div>
 
           {publications.length > 0 ? (
-            <div className="grid gap-1 sm:grid-cols-2">
-              {publications.map((p) => (
-                <div
-                  key={p.id}
-                  className="flex items-center justify-between gap-2 rounded-md border border-[var(--border)] px-2 py-1.5 text-xs"
-                >
-                  <span className="truncate">{p.destination?.title || 'Destination'}</span>
-                  <span className="shrink-0 font-medium">
-                    {p.status === 'published'
-                      ? 'Published'
-                      : p.status === 'failed'
-                        ? 'Failed'
-                        : 'Publishing…'}
-                  </span>
-                </div>
-              ))}
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wide app-muted">
+                Telegram
+              </p>
+              <ul className="grid gap-2 sm:grid-cols-2">
+                {publications.map((p) => (
+                  <li
+                    key={p.id}
+                    className="flex items-center justify-between gap-2 rounded-xl border border-[var(--border)] px-3 py-2.5 text-sm"
+                  >
+                    <span className="truncate">{p.destination?.title || 'Destination'}</span>
+                    <span
+                      className={
+                        p.status === 'published'
+                          ? 'text-[var(--primary)] font-medium shrink-0'
+                          : p.status === 'failed'
+                            ? 'text-[var(--danger,#ef4444)] font-medium shrink-0'
+                            : 'app-muted shrink-0'
+                      }
+                    >
+                      {p.status === 'published'
+                        ? 'Published'
+                        : p.status === 'failed'
+                          ? 'Failed'
+                          : 'Publishing…'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
           ) : job.result?.telegramPublish?.queued > 0 ? (
-            <p className="text-xs app-muted">Telegram publishing…</p>
+            <p className="text-sm app-muted">Telegram publishing…</p>
           ) : null}
 
-          <div className="flex flex-wrap gap-2">
-            <Link to={`/v/${job.result.shareToken}`} className="app-btn-secondary !px-3 !py-1.5 text-xs">
-              <ExternalLink className="w-3.5 h-3.5" />
+          <div className="flex flex-wrap gap-2 pt-1">
+            <Link to={`/v/${job.result.shareToken}`} className="app-btn-secondary">
+              <ExternalLink className="w-4 h-4" />
               Preview
             </Link>
-            <Link to="/studio/videos" className="app-btn-primary !px-3 !py-1.5 text-xs">
-              Library
+            <Link to="/studio/videos" className="app-btn-primary">
+              Open library
             </Link>
-            <button type="button" onClick={handleClearJob} className="app-link text-xs">
+            <button type="button" onClick={handleClearJob} className="app-btn-ghost">
               Upload another
             </button>
           </div>
-        </div>
+        </section>
       )}
     </div>
   );
