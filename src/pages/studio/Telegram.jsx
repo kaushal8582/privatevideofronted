@@ -343,11 +343,37 @@ export default function StudioTelegram() {
 }
 
 function ManageModal({ destination, saving, onClose, onSave }) {
-  const [settings, setSettings] = useState({ ...destination.settings });
+  const [settings, setSettings] = useState({
+    ...destination.settings,
+    messageFormat: {
+      beforeTitle: '',
+      afterTitle: '',
+      afterLink: '',
+      footer: '',
+      ...(destination.settings?.messageFormat || {}),
+    },
+  });
+
+  const mf = settings.messageFormat || {};
+  const previewParts = [
+    mf.beforeTitle?.trim(),
+    '🎬 Your Video Title',
+    mf.afterTitle?.trim(),
+    'https://mastplayer.in/v/XXXX',
+    mf.afterLink?.trim(),
+    mf.footer?.trim(),
+  ].filter(Boolean);
+
+  const setSlot = (key, value) => {
+    setSettings((s) => ({
+      ...s,
+      messageFormat: { ...s.messageFormat, [key]: value },
+    }));
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4">
-      <div className="app-card w-full max-w-md p-5 sm:p-6 space-y-4">
+      <div className="app-card w-full max-w-lg max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-4">
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold">{destination.title}</h2>
@@ -357,6 +383,7 @@ function ManageModal({ destination, saving, onClose, onSave }) {
             <X className="w-5 h-5" />
           </button>
         </div>
+
         <ul className="space-y-3">
           {SETTING_FIELDS.map((f) => (
             <li key={f.key} className="flex items-center justify-between gap-3">
@@ -379,6 +406,44 @@ function ManageModal({ destination, saving, onClose, onSave }) {
             </li>
           ))}
         </ul>
+
+        <div className="border-t border-[var(--border)] pt-4 space-y-3">
+          <div>
+            <h3 className="text-sm font-semibold">Message format</h3>
+            <p className="text-xs app-muted mt-0.5">
+              Optional text around title + watch link. Empty slots are skipped.
+            </p>
+          </div>
+
+          {[
+            { key: 'beforeTitle', label: 'Before title', placeholder: 'e.g. 🔥 New upload' },
+            { key: 'afterTitle', label: 'After title', placeholder: 'e.g. Full HD · No ads' },
+            { key: 'afterLink', label: 'After link', placeholder: 'e.g. Backup: https://t.me/…' },
+            { key: 'footer', label: 'Footer', placeholder: 'e.g. Join @YourChannel' },
+          ].map((slot) => (
+            <label key={slot.key} className="block">
+              <span className="mb-1 block text-xs font-medium app-muted">{slot.label}</span>
+              <textarea
+                rows={2}
+                maxLength={400}
+                value={mf[slot.key] || ''}
+                onChange={(e) => setSlot(slot.key, e.target.value)}
+                placeholder={slot.placeholder}
+                className="app-input !mt-0 !py-2 text-sm min-h-[2.5rem] resize-y"
+              />
+            </label>
+          ))}
+
+          <div className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2">
+            <p className="text-[10px] font-semibold uppercase tracking-wide app-muted mb-1.5">
+              Preview
+            </p>
+            <pre className="whitespace-pre-wrap break-words text-xs leading-relaxed font-sans">
+              {previewParts.join('\n\n') || '🎬 Your Video Title\n\nhttps://mastplayer.in/v/XXXX'}
+            </pre>
+          </div>
+        </div>
+
         <button
           type="button"
           disabled={saving}
