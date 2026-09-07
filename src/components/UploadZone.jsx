@@ -49,84 +49,101 @@ export default function UploadZone({
   };
 
   return (
-    <div className="space-y-4">
-      <div
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            if (!disabled) inputRef.current?.click();
-          }
-        }}
-        onDrop={onDrop}
-        onDragOver={onDragOver}
-        onDragLeave={onDragLeave}
-        onClick={() => !disabled && inputRef.current?.click()}
-        className={[
-          'relative rounded-2xl border-2 border-dashed px-6 py-12 sm:py-16 text-center cursor-pointer transition-all',
-          dragActive
-            ? 'border-[var(--primary)] bg-[var(--accent-soft)] scale-[1.01]'
-            : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--border-green)]',
-          disabled ? 'opacity-60 pointer-events-none' : '',
-        ].join(' ')}
-      >
-        <input
-          ref={inputRef}
-          type="file"
-          accept="video/mp4,video/webm,video/quicktime,video/x-matroska,.mp4,.webm,.mov,.mkv"
-          className="sr-only"
-          disabled={disabled}
-          onChange={(e) => handleFiles(e.target.files)}
-        />
-
-        <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--accent-medium)] text-[var(--primary)] flex items-center justify-center mb-5">
-          <Upload className="w-7 h-7" />
+    <div className="space-y-2">
+      {!file ? (
+        <div
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              if (!disabled) inputRef.current?.click();
+            }
+          }}
+          onDrop={onDrop}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onClick={() => !disabled && inputRef.current?.click()}
+          className={[
+            'relative flex flex-wrap items-center justify-center gap-3 rounded-xl border border-dashed px-4 py-5 text-center cursor-pointer transition-colors',
+            dragActive
+              ? 'border-[var(--primary)] bg-[var(--accent-soft)]'
+              : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--border-green)]',
+            disabled ? 'opacity-60 pointer-events-none' : '',
+          ].join(' ')}
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept="video/mp4,video/webm,video/quicktime,video/x-matroska,.mp4,.webm,.mov,.mkv"
+            className="sr-only"
+            disabled={disabled}
+            onChange={(e) => handleFiles(e.target.files)}
+          />
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--accent-medium)] text-[var(--primary)]">
+            <Upload className="w-4 h-4" />
+          </span>
+          <div className="text-left min-w-0">
+            <p className="text-sm font-semibold">Drop video or click to choose</p>
+            <p className="text-xs app-muted">MP4, WebM, MOV, MKV · up to {MAX_MB} MB</p>
+          </div>
         </div>
-
-        <h2 className="text-xl sm:text-2xl font-semibold mb-2">Upload Video</h2>
-        <p className="app-muted mb-6">
-          Drag &amp; drop your video
-          <span className="mx-2 opacity-50">or</span>
-        </p>
-
-        <span className="app-btn-primary inline-flex">Choose Video</span>
-
-        <p className="mt-6 text-sm app-muted">MP4, WebM, MOV, MKV · up to {MAX_MB} MB</p>
-      </div>
-
-      {localError && <p className="app-error">{localError}</p>}
-
-      {file && (
-        <div className="flex items-start gap-4 app-card p-4 sm:p-5">
-          <div className="shrink-0 w-11 h-11 rounded-xl bg-[var(--accent-medium)] text-[var(--primary)] flex items-center justify-center">
-            <Film className="w-5 h-5" />
+      ) : (
+        <div
+          className={[
+            'flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2',
+            disabled ? 'opacity-60' : '',
+          ].join(' ')}
+          onDrop={onDrop}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept="video/mp4,video/webm,video/quicktime,video/x-matroska,.mp4,.webm,.mov,.mkv"
+            className="sr-only"
+            disabled={disabled}
+            onChange={(e) => handleFiles(e.target.files)}
+          />
+          <div className="shrink-0 w-8 h-8 rounded-lg bg-[var(--accent-medium)] text-[var(--primary)] flex items-center justify-center">
+            <Film className="w-4 h-4" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-medium truncate" title={file.name}>
+            <p className="text-sm font-medium truncate" title={file.name}>
               {file.name}
             </p>
-            <p className="text-sm app-muted mt-1">
+            <p className="text-xs app-muted">
               {formatFileSize(file.size)} · {getFileExtension(file.name)}
-              {file.type ? ` · ${file.type}` : ''}
             </p>
           </div>
           {!disabled && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setLocalError(null);
-                onClear();
-              }}
-              className="shrink-0 p-2 rounded-lg app-muted hover:text-[var(--foreground)] hover:bg-[var(--surface-elevated)] transition-colors"
-              aria-label="Remove selected file"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => inputRef.current?.click()}
+                className="shrink-0 text-xs app-link"
+              >
+                Change
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLocalError(null);
+                  onClear();
+                }}
+                className="shrink-0 p-1.5 rounded-md app-muted hover:text-[var(--foreground)] hover:bg-[var(--surface-elevated)]"
+                aria-label="Remove selected file"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </>
           )}
         </div>
       )}
+
+      {localError && <p className="app-error text-sm">{localError}</p>}
     </div>
   );
 }
