@@ -24,7 +24,6 @@ const SETTING_FIELDS = [
   { key: 'searchEnabled', label: 'Movie / video search' },
   { key: 'adminBypass', label: 'Allow admin links' },
   { key: 'includeThumbnail', label: 'Include thumbnail' },
-  { key: 'includeDescription', label: 'Include description' },
 ];
 
 function formatMembers(n) {
@@ -146,7 +145,8 @@ export default function StudioTelegram() {
         <div>
           <h1 className="app-title">Telegram</h1>
           <p className="app-subtitle mt-2">
-            Connect groups and channels to publish MastPlayer videos with a Watch Now button.
+            Connect groups and channels to publish videos as title + watch link (with optional
+            thumbnail).
           </p>
         </div>
         <button type="button" onClick={openConnect} className="app-btn-primary shrink-0">

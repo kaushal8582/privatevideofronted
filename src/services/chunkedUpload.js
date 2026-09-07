@@ -28,8 +28,14 @@ export function readLocalVideoMeta(file) {
 
     video.onloadedmetadata = () => {
       const duration = Number.isFinite(video.duration) ? video.duration : null;
+      // Auto-thumb at ~frame 60 (assume 30fps → 2s), clamped to video length
+      const FRAME_INDEX = 60;
+      const ASSUMED_FPS = 30;
+      const targetSec = FRAME_INDEX / ASSUMED_FPS;
       const seekTo =
-        duration && duration > 1 ? Math.min(1, duration * 0.1) : 0.1;
+        duration && duration > 0
+          ? Math.min(targetSec, Math.max(0, duration - 0.05))
+          : targetSec;
       const onSeeked = () => {
         try {
           const canvas = document.createElement('canvas');
