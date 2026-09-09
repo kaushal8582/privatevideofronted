@@ -29,8 +29,8 @@ const SETTING_FIELDS = [
 function formatMembers(n) {
   if (n == null || !Number.isFinite(Number(n))) return null;
   const v = Number(n);
-  if (v >= 1000) return `${(v / 1000).toFixed(v >= 10000 ? 0 : 1)}K members`;
-  return `${v} members`;
+  if (v >= 1000) return `${(v / 1000).toFixed(v >= 10000 ? 0 : 1)}K`;
+  return String(v);
 }
 
 export default function StudioTelegram() {
@@ -78,7 +78,6 @@ export default function StudioTelegram() {
     }
   };
 
-  // Poll while connect modal open
   useEffect(() => {
     if (!connectOpen || !codeData) return undefined;
     const before = new Set(activeDestinations.map((d) => d.id));
@@ -140,167 +139,195 @@ export default function StudioTelegram() {
   const managing = destinations.find((d) => d.id === manageId);
 
   return (
-    <div className="max-w-3xl space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="app-title">Telegram</h1>
-          <p className="app-subtitle mt-2">
-            Connect groups and channels to publish videos as title + watch link (with optional
-            thumbnail).
+    <div className="w-full space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h1 className="font-[family-name:var(--font-display)] text-xl sm:text-2xl font-bold tracking-tight">
+            Telegram
+          </h1>
+          <p className="text-xs sm:text-sm app-muted">
+            Connect groups/channels · publish title + watch link
           </p>
         </div>
-        <button type="button" onClick={openConnect} className="app-btn-primary shrink-0">
-          <MessageCircle className="w-4 h-4" />
-          Connect Telegram
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={load}
+            className="app-btn-ghost !py-1.5 !px-2.5 !text-xs"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            Refresh
+          </button>
+          <button
+            type="button"
+            onClick={openConnect}
+            className="app-btn-primary !py-1.5 !px-3 !text-xs"
+          >
+            <MessageCircle className="w-3.5 h-3.5" />
+            Connect
+          </button>
+        </div>
       </div>
 
       {loading ? (
-        <p className="app-muted flex items-center gap-2">
+        <p className="app-muted flex items-center gap-2 text-sm">
           <Loader2 className="w-4 h-4 animate-spin" /> Loading destinations…
         </p>
       ) : destinations.length === 0 ? (
-        <div className="app-card-padded text-center space-y-3">
-          <p className="font-semibold">No Telegram destinations yet</p>
-          <p className="text-sm app-muted">
-            Generate a connection code, add the bot to your group/channel, then send{' '}
+        <div className="app-card p-4 sm:p-5 text-center space-y-2">
+          <p className="text-sm font-semibold">No destinations yet</p>
+          <p className="text-xs app-muted max-w-md mx-auto">
+            Generate a code, add the bot to your group/channel, then send{' '}
             <code className="text-[var(--primary)]">/connect CODE</code>.
           </p>
-          <button type="button" onClick={openConnect} className="app-btn-secondary">
+          <button
+            type="button"
+            onClick={openConnect}
+            className="app-btn-secondary !py-1.5 !px-3 !text-xs"
+          >
             Connect Telegram
           </button>
         </div>
       ) : (
-        <ul className="space-y-3">
+        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
           {destinations.map((d) => (
-            <li key={d.id} className="app-card-padded space-y-3">
-              <div className="flex flex-wrap items-start justify-between gap-3">
+            <article key={d.id} className="app-card p-3 space-y-2.5 flex flex-col">
+              <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="font-semibold truncate">{d.title}</h2>
-                    <span className="app-badge capitalize">{d.type}</span>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <h2 className="text-sm font-semibold truncate">{d.title}</h2>
+                    <span className="app-badge !text-[10px] capitalize">{d.type}</span>
                     {d.isActive ? (
-                      <span className="app-badge app-badge-green">Connected</span>
+                      <span className="app-badge app-badge-green !text-[10px]">Live</span>
                     ) : (
-                      <span className="app-badge">Disconnected</span>
+                      <span className="app-badge !text-[10px]">Off</span>
                     )}
                   </div>
-                  <p className="text-sm app-muted mt-1">
-                    Bot: {d.botStatus}
+                  <p className="text-[11px] app-muted mt-0.5 leading-snug">
+                    {d.botStatus}
                     {formatMembers(d.memberCount) ? ` · ${formatMembers(d.memberCount)}` : ''}
                     {d.actionHint ? ` · ⚠ ${d.actionHint}` : ''}
                   </p>
                 </div>
-                <div className="flex gap-2">
-                  {d.isActive ? (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => setManageId(d.id)}
-                        className="app-btn-secondary"
-                      >
-                        <Settings2 className="w-4 h-4" />
-                        Manage
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDisconnectId(d.id)}
-                        className="app-btn-ghost text-[var(--danger)]"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Disconnect
-                      </button>
-                    </>
-                  ) : (
-                    <button type="button" onClick={openConnect} className="app-btn-secondary">
-                      Reconnect
-                    </button>
-                  )}
-                </div>
               </div>
+
               {d.isActive ? (
-                <div className="flex flex-wrap gap-2 text-xs">
+                <div className="flex flex-wrap gap-1">
                   {d.settings.autoPublish ? (
-                    <span className="app-badge app-badge-green">Auto publish</span>
+                    <span className="app-badge app-badge-green !text-[10px]">Auto</span>
                   ) : null}
-                  {d.settings.deleteLinks ? <span className="app-badge">Delete links</span> : null}
-                  {d.settings.searchEnabled ? <span className="app-badge">Search</span> : null}
+                  {d.settings.deleteLinks ? (
+                    <span className="app-badge !text-[10px]">Delete links</span>
+                  ) : null}
+                  {d.settings.searchEnabled ? (
+                    <span className="app-badge !text-[10px]">Search</span>
+                  ) : null}
+                  {d.settings.includeThumbnail ? (
+                    <span className="app-badge !text-[10px]">Thumb</span>
+                  ) : null}
                 </div>
               ) : (
-                <p className="text-sm app-muted">
-                  Bot was removed or destination disconnected. Use Connect to link again.
+                <p className="text-[11px] app-muted">
+                  Disconnected. Reconnect to publish again.
                 </p>
               )}
-            </li>
+
+              <div className="mt-auto flex flex-wrap gap-1.5 pt-1">
+                {d.isActive ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setManageId(d.id)}
+                      className="app-btn-secondary !py-1 !px-2 !text-xs"
+                    >
+                      <Settings2 className="w-3.5 h-3.5" />
+                      Manage
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDisconnectId(d.id)}
+                      className="app-btn-ghost !py-1 !px-2 !text-xs text-[var(--danger)]"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      Disconnect
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={openConnect}
+                    className="app-btn-secondary !py-1 !px-2 !text-xs"
+                  >
+                    Reconnect
+                  </button>
+                )}
+              </div>
+            </article>
           ))}
-        </ul>
+        </div>
       )}
 
-      <button type="button" onClick={load} className="app-btn-ghost text-sm">
-        <RefreshCw className="w-4 h-4" />
-        Refresh
-      </button>
-
-      {/* Connect modal */}
       {connectOpen ? (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4">
-          <div className="app-card w-full max-w-lg p-5 sm:p-6 space-y-4 relative">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-3">
+          <div className="app-card w-full max-w-md p-4 space-y-3 relative">
             <button
               type="button"
               onClick={() => {
                 setConnectOpen(false);
                 setCodeData(null);
               }}
-              className="absolute right-3 top-3 rounded-lg p-2 app-muted hover:text-[var(--foreground)]"
+              className="absolute right-2 top-2 rounded-md p-1.5 app-muted hover:text-[var(--foreground)]"
               aria-label="Close"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
-            <h2 className="text-xl font-semibold pr-8">Connect Telegram</h2>
+            <h2 className="text-base font-semibold pr-8">Connect Telegram</h2>
             {codeLoading || !codeData ? (
-              <p className="app-muted flex items-center gap-2">
+              <p className="app-muted flex items-center gap-2 text-sm">
                 <Loader2 className="w-4 h-4 animate-spin" /> Generating code…
               </p>
             ) : (
               <>
-                <div className="rounded-xl border border-[var(--border-accent)] bg-[var(--accent-soft)] px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide app-muted">
-                    Your connection code
+                <div className="rounded-lg border border-[var(--border-accent)] bg-[var(--accent-soft)] px-3 py-2.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide app-muted">
+                    Connection code
                   </p>
-                  <p className="mt-1 font-mono text-2xl font-bold tracking-wider text-[var(--primary)]">
+                  <p className="mt-0.5 font-mono text-xl font-bold tracking-wider text-[var(--primary)]">
                     {codeData.code}
                   </p>
-                  <p className="text-xs app-muted mt-1">
-                    Expires in {codeData.expiresInMinutes || 10} minutes
+                  <p className="text-[11px] app-muted">
+                    Expires in {codeData.expiresInMinutes || 10} min
                   </p>
                 </div>
-                <ol className="text-sm space-y-2 app-muted list-decimal pl-5">
+                <ol className="text-xs space-y-1.5 app-muted list-decimal pl-4 leading-relaxed">
                   <li>
                     Add{' '}
                     <strong className="text-[var(--foreground)]">
                       @{codeData.botUsername || 'your bot'}
                     </strong>{' '}
-                    to your Telegram group or channel
+                    to your group or channel
                   </li>
+                  <li>Make the bot admin (delete msgs / post msgs)</li>
                   <li>
-                    Make the bot admin (groups: Delete Messages; channels: Post Messages)
-                  </li>
-                  <li>
-                    Send this command in the group (or as a channel post):
-                    <code className="block mt-1 rounded-lg bg-[var(--surface)] border border-[var(--border)] px-3 py-2 text-[var(--foreground)]">
+                    Send:
+                    <code className="block mt-1 rounded-md bg-[var(--surface)] border border-[var(--border)] px-2.5 py-1.5 text-[var(--foreground)] text-xs">
                       /connect {codeData.code}
                     </code>
                   </li>
-                  <li>Return here — this page refreshes automatically</li>
+                  <li>Return here — refreshes automatically</li>
                 </ol>
-                <div className="flex flex-wrap gap-2">
-                  <button type="button" onClick={copyCode} className="app-btn-primary">
-                    <Copy className="w-4 h-4" />
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={copyCode}
+                    className="app-btn-primary !py-1.5 !px-3 !text-xs"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
                     Copy command
                   </button>
-                  <p className="text-sm app-muted self-center flex items-center gap-1.5">
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    Waiting for connection…
+                  <p className="text-[11px] app-muted flex items-center gap-1.5">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    Waiting…
                   </p>
                 </div>
               </>
@@ -309,7 +336,6 @@ export default function StudioTelegram() {
         </div>
       ) : null}
 
-      {/* Manage settings */}
       {managing ? (
         <ManageModal
           destination={managing}
@@ -319,19 +345,26 @@ export default function StudioTelegram() {
         />
       ) : null}
 
-      {/* Disconnect confirm */}
       {disconnectId ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="app-card w-full max-w-md p-6 space-y-4">
-            <h2 className="text-lg font-semibold">Disconnect destination?</h2>
-            <p className="text-sm app-muted">
-              MastPlayer will stop publishing to this destination. Publication history is kept.
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3">
+          <div className="app-card w-full max-w-sm p-4 space-y-3">
+            <h2 className="text-base font-semibold">Disconnect destination?</h2>
+            <p className="text-xs app-muted">
+              Publishing stops here. Publication history is kept.
             </p>
             <div className="flex gap-2 justify-end">
-              <button type="button" onClick={() => setDisconnectId(null)} className="app-btn-secondary">
+              <button
+                type="button"
+                onClick={() => setDisconnectId(null)}
+                className="app-btn-secondary !py-1.5 !px-3 !text-xs"
+              >
                 Cancel
               </button>
-              <button type="button" onClick={confirmDisconnect} className="app-btn-primary">
+              <button
+                type="button"
+                onClick={confirmDisconnect}
+                className="app-btn-primary !py-1.5 !px-3 !text-xs"
+              >
                 Disconnect
               </button>
             </div>
@@ -372,34 +405,34 @@ function ManageModal({ destination, saving, onClose, onSave }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4">
-      <div className="app-card w-full max-w-lg max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold">{destination.title}</h2>
-            <p className="text-sm app-muted capitalize">{destination.type} settings</p>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-3">
+      <div className="app-card w-full max-w-lg max-h-[90vh] overflow-y-auto p-4 space-y-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <h2 className="text-base font-semibold truncate">{destination.title}</h2>
+            <p className="text-[11px] app-muted capitalize">{destination.type} settings</p>
           </div>
-          <button type="button" onClick={onClose} className="p-2 app-muted">
-            <X className="w-5 h-5" />
+          <button type="button" onClick={onClose} className="p-1.5 app-muted">
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        <ul className="space-y-3">
+        <ul className="space-y-2">
           {SETTING_FIELDS.map((f) => (
             <li key={f.key} className="flex items-center justify-between gap-3">
-              <span className="text-sm">{f.label}</span>
+              <span className="text-xs sm:text-sm">{f.label}</span>
               <button
                 type="button"
                 role="switch"
                 aria-checked={Boolean(settings[f.key])}
                 onClick={() => setSettings((s) => ({ ...s, [f.key]: !s[f.key] }))}
-                className={`relative h-7 w-12 rounded-full transition-colors ${
+                className={`relative h-6 w-10 rounded-full transition-colors ${
                   settings[f.key] ? 'bg-[var(--gradient-brand-h)]' : 'bg-[var(--border)]'
                 }`}
               >
                 <span
-                  className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform ${
-                    settings[f.key] ? 'translate-x-5' : ''
+                  className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                    settings[f.key] ? 'translate-x-4' : ''
                   }`}
                 />
               </button>
@@ -407,38 +440,42 @@ function ManageModal({ destination, saving, onClose, onSave }) {
           ))}
         </ul>
 
-        <div className="border-t border-[var(--border)] pt-4 space-y-3">
+        <div className="border-t border-[var(--border)] pt-3 space-y-2">
           <div>
-            <h3 className="text-sm font-semibold">Message format</h3>
-            <p className="text-xs app-muted mt-0.5">
-              Optional text around title + watch link. Empty slots are skipped.
+            <h3 className="text-xs font-semibold">Message format</h3>
+            <p className="text-[11px] app-muted">
+              Optional text around title + link. Empty slots are skipped.
             </p>
           </div>
 
-          {[
-            { key: 'beforeTitle', label: 'Before title', placeholder: 'e.g. 🔥 New upload' },
-            { key: 'afterTitle', label: 'After title', placeholder: 'e.g. Full HD · No ads' },
-            { key: 'afterLink', label: 'After link', placeholder: 'e.g. Backup: https://t.me/…' },
-            { key: 'footer', label: 'Footer', placeholder: 'e.g. Join @YourChannel' },
-          ].map((slot) => (
-            <label key={slot.key} className="block">
-              <span className="mb-1 block text-xs font-medium app-muted">{slot.label}</span>
-              <textarea
-                rows={2}
-                maxLength={400}
-                value={mf[slot.key] || ''}
-                onChange={(e) => setSlot(slot.key, e.target.value)}
-                placeholder={slot.placeholder}
-                className="app-input !mt-0 !py-2 text-sm min-h-[2.5rem] resize-y"
-              />
-            </label>
-          ))}
+          <div className="grid gap-2 sm:grid-cols-2">
+            {[
+              { key: 'beforeTitle', label: 'Before title', placeholder: 'e.g. 🔥 New upload' },
+              { key: 'afterTitle', label: 'After title', placeholder: 'e.g. Full HD' },
+              { key: 'afterLink', label: 'After link', placeholder: 'e.g. Backup link' },
+              { key: 'footer', label: 'Footer', placeholder: 'e.g. Join @Channel' },
+            ].map((slot) => (
+              <label key={slot.key} className="block">
+                <span className="mb-0.5 block text-[10px] font-medium app-muted">
+                  {slot.label}
+                </span>
+                <textarea
+                  rows={2}
+                  maxLength={400}
+                  value={mf[slot.key] || ''}
+                  onChange={(e) => setSlot(slot.key, e.target.value)}
+                  placeholder={slot.placeholder}
+                  className="app-input !mt-0 !py-1.5 !px-2.5 text-xs min-h-[2.25rem] resize-y"
+                />
+              </label>
+            ))}
+          </div>
 
-          <div className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2">
-            <p className="text-[10px] font-semibold uppercase tracking-wide app-muted mb-1.5">
+          <div className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2.5 py-2">
+            <p className="text-[10px] font-semibold uppercase tracking-wide app-muted mb-1">
               Preview
             </p>
-            <pre className="whitespace-pre-wrap break-words text-xs leading-relaxed font-sans">
+            <pre className="whitespace-pre-wrap break-words text-[11px] leading-relaxed font-sans">
               {previewParts.join('\n\n') || '🎬 Your Video Title\n\nhttps://mastplayer.in/v/XXXX'}
             </pre>
           </div>
@@ -448,7 +485,7 @@ function ManageModal({ destination, saving, onClose, onSave }) {
           type="button"
           disabled={saving}
           onClick={() => onSave(settings)}
-          className="app-btn-primary w-full"
+          className="app-btn-primary w-full !py-2 !text-sm"
         >
           {saving ? (
             <>

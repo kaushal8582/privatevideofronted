@@ -114,111 +114,180 @@ export default function StudioProfile() {
   };
 
   if (!user) {
-    return <p className="app-muted">Loading profile…</p>;
+    return <p className="app-muted text-sm">Loading profile…</p>;
   }
 
   return (
-    <div className="max-w-2xl space-y-6">
-      <div>
-        <h1 className="app-title">Profile</h1>
-        <p className="app-subtitle mt-2">Manage your creator account, social links, and app settings.</p>
+    <div className="w-full space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h1 className="font-[family-name:var(--font-display)] text-xl sm:text-2xl font-bold tracking-tight">
+            Profile
+          </h1>
+          <p className="text-xs sm:text-sm app-muted">
+            Account, social links, and app settings
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="app-btn-ghost !py-1.5 !px-2.5 !text-xs"
+          >
+            Log out
+          </button>
+          <button
+            type="submit"
+            form="profile-form"
+            disabled={saving}
+            className="app-btn-primary !py-1.5 !px-3 !text-xs"
+          >
+            {saving ? 'Saving…' : 'Save changes'}
+          </button>
+        </div>
       </div>
 
-      <form onSubmit={handleSave} className="space-y-6">
-        <div className="app-card-padded space-y-6">
-          <div className="flex items-center gap-4">
-            {user.avatar ? (
-              <img
-                src={user.avatar}
-                alt=""
-                className="w-16 h-16 rounded-2xl object-cover border border-[var(--border)]"
-                referrerPolicy="no-referrer"
-              />
-            ) : (
-              <div className="w-16 h-16 rounded-2xl bg-[var(--accent-medium)] text-[var(--primary)] flex items-center justify-center text-2xl font-semibold">
-                {(user.name || user.email || '?').charAt(0).toUpperCase()}
+      <form id="profile-form" onSubmit={handleSave} className="grid gap-3 lg:grid-cols-12">
+        <div className="lg:col-span-5 space-y-3">
+          <section className="app-card p-3 sm:p-4 space-y-3">
+            <div className="flex items-center gap-3">
+              {user.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt=""
+                  className="w-11 h-11 rounded-xl object-cover border border-[var(--border)]"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="w-11 h-11 rounded-xl bg-[var(--accent-medium)] text-[var(--primary)] flex items-center justify-center text-lg font-semibold">
+                  {(user.name || user.email || '?').charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold truncate">{user.name}</p>
+                <p className="text-xs app-muted truncate">{user.email}</p>
               </div>
-            )}
-            <div className="min-w-0">
-              <p className="font-semibold truncate">{user.name}</p>
-              <p className="text-sm app-muted truncate">{user.email}</p>
             </div>
-          </div>
 
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide app-muted mb-2">
-              Sign-in methods
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {providers.includes('email') && <span className="app-badge">Email &amp; password</span>}
-              {providers.includes('google') && <span className="app-badge">Google</span>}
-              {!providers.length && <span className="text-xs app-muted">No providers listed</span>}
+            <div className="flex flex-wrap gap-1.5">
+              {providers.includes('email') && (
+                <span className="app-badge !text-[10px]">Email</span>
+              )}
+              {providers.includes('google') && (
+                <span className="app-badge !text-[10px]">Google</span>
+              )}
+              {!providers.length && (
+                <span className="text-[11px] app-muted">No providers listed</span>
+              )}
             </div>
-          </div>
 
-          <label className="app-label">
-            Display name
-            <input
-              type="text"
-              required
-              minLength={2}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="app-input"
-            />
-          </label>
+            <label className="block">
+              <span className="text-xs font-medium">Display name</span>
+              <input
+                type="text"
+                required
+                minLength={2}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="app-input !mt-1 !py-2 !text-sm"
+              />
+            </label>
+          </section>
+
+          <section className="app-card p-3 sm:p-4">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--accent-soft)] text-[var(--primary)]">
+                <Download className="w-4 h-4" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <h2 className="text-sm font-semibold">Allow download in app</h2>
+                    <p className="text-[11px] app-muted leading-snug mt-0.5">
+                      Viewers can download your videos in Mast Player.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    id={downloadToggleId}
+                    role="switch"
+                    aria-checked={allowVideoDownload}
+                    onClick={() => setAllowVideoDownload((v) => !v)}
+                    className={`relative h-6 w-10 shrink-0 rounded-full transition-colors ${
+                      allowVideoDownload
+                        ? 'bg-[var(--gradient-brand-h)]'
+                        : 'bg-[var(--border)]'
+                    }`}
+                  >
+                    <span
+                      className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                        allowVideoDownload ? 'translate-x-4' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+                <p className="mt-1 text-[11px] font-medium text-[var(--primary)]">
+                  {allowVideoDownload ? 'Enabled' : 'Disabled'}
+                </p>
+              </div>
+            </div>
+          </section>
         </div>
 
-        <div className="app-card-padded space-y-4">
-          <div className="flex flex-wrap items-start justify-between gap-3">
+        <section className="lg:col-span-7 app-card p-3 sm:p-4 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <Link2 className="h-5 w-5 text-[var(--primary)]" />
-                <h2 className="font-semibold text-lg">Social Links</h2>
-                <span className="app-badge app-badge-green tabular-nums">{socialLinks.length}</span>
+                <Link2 className="h-4 w-4 text-[var(--primary)]" />
+                <h2 className="text-sm font-semibold">Social Links</h2>
+                <span className="app-badge app-badge-green !text-[10px] tabular-nums">
+                  {socialLinks.length}/{MAX_SOCIAL_LINKS}
+                </span>
               </div>
-              <p className="text-sm app-muted mt-1">
-                Save your social profiles. Display on public pages coming soon.
+              <p className="text-[11px] app-muted mt-0.5">
+                Instagram, YouTube, or any URL — public display coming soon
               </p>
             </div>
             <button
               type="button"
               onClick={addLink}
               disabled={socialLinks.length >= MAX_SOCIAL_LINKS}
-              className="app-btn-secondary shrink-0 disabled:opacity-50"
+              className="app-btn-secondary !py-1.5 !px-2.5 !text-xs shrink-0 disabled:opacity-50"
             >
-              <Plus className="h-4 w-4" />
-              Add Link
+              <Plus className="h-3.5 w-3.5" />
+              Add
             </button>
           </div>
 
           {socialLinks.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--surface)] px-4 py-8 text-center">
-              <p className="text-sm app-muted">No links yet. Add Instagram, YouTube, or any URL.</p>
+            <div className="rounded-lg border border-dashed border-[var(--border)] bg-[var(--surface)] px-3 py-5 text-center">
+              <p className="text-xs app-muted">No links yet. Add one to get started.</p>
             </div>
           ) : (
-            <ul className="space-y-3">
+            <ul className="space-y-2">
               {socialLinks.map((link, index) => {
                 const displayIndex = socialLinks.length - index;
                 const isActive = activeLinkIndex === index;
                 return (
                   <li
                     key={link._key}
-                    className={`rounded-xl border bg-[var(--surface)] p-3 sm:p-4 transition-colors ${
+                    className={`rounded-lg border bg-[var(--surface)] p-2.5 transition-colors ${
                       isActive
-                        ? 'border-[var(--border-accent)] shadow-[0_0_0_1px_var(--glow-cyan)]'
+                        ? 'border-[var(--border-accent)]'
                         : 'border-[var(--border)]'
                     }`}
                   >
-                    <div className="flex gap-3">
-                      <div className="flex flex-col items-center gap-1 pt-1 shrink-0">
+                    <div className="flex gap-2.5">
+                      <div className="flex flex-col items-center gap-0.5 pt-1 shrink-0">
                         <SocialPlatformIcon url={link.url} platform={link.platform} />
-                        <span className="text-[10px] font-semibold app-muted">#{displayIndex}</span>
+                        <span className="text-[10px] font-semibold app-muted">
+                          #{displayIndex}
+                        </span>
                       </div>
 
-                      <div className="min-w-0 flex-1 space-y-3">
-                        <label className="app-label !text-xs">
-                          Title
+                      <div className="min-w-0 flex-1 grid gap-2 sm:grid-cols-5">
+                        <label className="block sm:col-span-2">
+                          <span className="text-[10px] font-medium app-muted">Title</span>
                           <input
                             type="text"
                             value={link.title}
@@ -226,11 +295,11 @@ export default function StudioProfile() {
                             placeholder="e.g. Instagram"
                             onFocus={() => setActiveLinkIndex(index)}
                             onChange={(e) => updateLink(index, { title: e.target.value })}
-                            className="app-input !mt-1 !py-2.5"
+                            className="app-input !mt-0.5 !py-1.5 !px-2.5 !text-sm"
                           />
                         </label>
-                        <label className="app-label !text-xs">
-                          Link URL
+                        <label className="block sm:col-span-3">
+                          <span className="text-[10px] font-medium app-muted">URL</span>
                           <input
                             type="text"
                             value={link.url}
@@ -238,7 +307,7 @@ export default function StudioProfile() {
                             placeholder="instagram.com/yourhandle"
                             onFocus={() => setActiveLinkIndex(index)}
                             onChange={(e) => updateLink(index, { url: e.target.value })}
-                            className="app-input !mt-1 !py-2.5"
+                            className="app-input !mt-0.5 !py-1.5 !px-2.5 !text-sm"
                           />
                         </label>
                       </div>
@@ -246,10 +315,10 @@ export default function StudioProfile() {
                       <button
                         type="button"
                         onClick={() => removeLink(index)}
-                        className="self-start rounded-lg p-2 text-[var(--danger)] hover:bg-[var(--danger-soft)] transition-colors"
+                        className="self-start rounded-md p-1.5 text-[var(--danger)] hover:bg-[var(--danger-soft)] transition-colors"
                         aria-label="Remove link"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     </div>
                   </li>
@@ -257,56 +326,8 @@ export default function StudioProfile() {
               })}
             </ul>
           )}
-        </div>
-
-        <div className="app-card-padded">
-          <div className="flex items-start gap-4">
-            <span className="app-stat-icon shrink-0">
-              <Download className="w-5 h-5" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <h2 className="font-semibold">Allow download in app</h2>
-                  <p className="text-sm app-muted mt-1">
-                    When enabled, viewers can download your videos in the Mast Player app. Applies
-                    to all of your videos.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  id={downloadToggleId}
-                  role="switch"
-                  aria-checked={allowVideoDownload}
-                  onClick={() => setAllowVideoDownload((v) => !v)}
-                  className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${
-                    allowVideoDownload
-                      ? 'bg-[var(--gradient-brand-h)]'
-                      : 'bg-[var(--border)]'
-                  }`}
-                >
-                  <span
-                    className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform ${
-                      allowVideoDownload ? 'translate-x-5' : 'translate-x-0'
-                    }`}
-                  />
-                </button>
-              </div>
-              <p className="mt-2 text-xs font-medium text-[var(--primary)]">
-                {allowVideoDownload ? 'Download enabled' : 'Download disabled'}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <button type="submit" disabled={saving} className="app-btn-primary w-full sm:w-auto">
-          {saving ? 'Saving…' : 'Save changes'}
-        </button>
+        </section>
       </form>
-
-      <button type="button" onClick={handleLogout} className="app-btn-ghost w-full sm:w-auto">
-        Log out
-      </button>
     </div>
   );
 }

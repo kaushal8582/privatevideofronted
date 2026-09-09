@@ -145,6 +145,7 @@ export async function uploadVideoChunked(file, onProgress, signal, options = {})
     : [];
   const customTitle = String(options.title || '').trim();
   const customThumbnailFile = options.thumbnailFile || null;
+  const category = String(options.category || 'adult').trim() || 'adult';
 
   const { data: initRes } = await api.post(
     '/videos/upload/init',
@@ -152,6 +153,7 @@ export async function uploadVideoChunked(file, onProgress, signal, options = {})
       filename: file.name,
       mimeType: file.type || 'video/mp4',
       size: file.size,
+      category,
       ...(customTitle ? { title: customTitle.slice(0, 120) } : {}),
     },
     { signal }
@@ -228,6 +230,7 @@ export async function uploadVideoChunked(file, onProgress, signal, options = {})
         parts: completed.sort((a, b) => a.partNumber - b.partNumber),
         duration: meta.duration,
         hasThumbnail,
+        category,
         telegramDestinationIds,
       },
       { signal }

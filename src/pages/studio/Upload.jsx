@@ -20,6 +20,10 @@ import {
   getFriendlyError,
   retryTelegramPublication,
 } from '../../services/api.js';
+import {
+  DEFAULT_VIDEO_CATEGORY,
+  VIDEO_CATEGORIES,
+} from '../../constants/videoCategories.js';
 
 function formatMembers(n) {
   if (n == null || !Number.isFinite(Number(n))) return null;
@@ -40,6 +44,7 @@ export default function StudioUpload() {
   const { job, isUploading, startUpload, clearJob } = useUploadQueue();
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState('');
+  const [category, setCategory] = useState(DEFAULT_VIDEO_CATEGORY);
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [localError, setLocalError] = useState(null);
@@ -192,6 +197,7 @@ export default function StudioUpload() {
 
     const outcome = await startUpload(file, {
       title: title.trim(),
+      category,
       thumbnailFile,
       telegramDestinationIds,
     });
@@ -202,6 +208,7 @@ export default function StudioUpload() {
     }
     setFile(null);
     setTitle('');
+    setCategory(DEFAULT_VIDEO_CATEGORY);
     setThumbnailFile(null);
   };
 
@@ -209,6 +216,7 @@ export default function StudioUpload() {
     clearJob();
     setFile(null);
     setTitle('');
+    setCategory(DEFAULT_VIDEO_CATEGORY);
     setThumbnailFile(null);
     setLocalError(null);
   };
@@ -275,6 +283,26 @@ export default function StudioUpload() {
                   />
                   <span className="mt-1 block text-xs app-muted text-right">
                     {title.length}/120
+                  </span>
+                </label>
+
+                <label className="block">
+                  <span className="app-label">Category</span>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    disabled={isUploading}
+                    className="app-input"
+                  >
+                    {VIDEO_CATEGORIES.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="mt-1 block text-xs app-muted">
+                    Default is Adult 18+. Adult / Porn can still post to Telegram, but never appear
+                    in group search.
                   </span>
                 </label>
 
@@ -420,6 +448,7 @@ export default function StudioUpload() {
                   <span className="text-[var(--foreground)] font-medium">
                     {title.trim() || titlePlaceholder}
                   </span>
+                  {` · ${VIDEO_CATEGORIES.find((c) => c.value === category)?.label || category}`}
                   {sendToTelegram && selectedIds.length
                     ? ` · ${selectedIds.length} Telegram`
                     : ''}

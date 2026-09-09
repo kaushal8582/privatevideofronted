@@ -14,6 +14,7 @@ import {
   formatDuration,
   formatFileSize,
 } from '../../utils/formatters.js';
+import { categoryLabel } from '../../constants/videoCategories.js';
 
 export default function StudioVideos() {
   const { videos, pagination, loading, error, deletingId, reload, removeVideo } =
@@ -108,7 +109,10 @@ export default function StudioVideos() {
                           <p className="font-semibold truncate max-w-[18rem]" title={video.title}>
                             {video.title}
                           </p>
-                          <p className="text-xs app-muted tabular-nums">{formatDuration(video.duration)}</p>
+                          <p className="text-xs app-muted tabular-nums">
+                            {formatDuration(video.duration)}
+                            {video.category ? ` · ${categoryLabel(video.category)}` : ''}
+                          </p>
                         </div>
                       </div>
                     </td>
