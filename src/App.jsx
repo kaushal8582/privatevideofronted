@@ -7,6 +7,7 @@ import StudioLayout from './layouts/StudioLayout.jsx';
 import Landing from './pages/Landing.jsx';
 import WatchVideo from './pages/WatchVideo.jsx';
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx';
+import DmcaPolicy from './pages/DmcaPolicy.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import NotFound from './pages/NotFound.jsx';
@@ -30,9 +31,14 @@ function MarketingShell() {
       <footer className="border-t border-[var(--border)] py-6">
         <div className="app-container px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-3 text-sm app-muted">
           <span>© {new Date().getFullYear()} MastPlayer</span>
-          <Link to="/privacy" className="app-link text-sm">
-            Privacy Policy
-          </Link>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <Link to="/privacy" className="app-link text-sm">
+              Privacy Policy
+            </Link>
+            <Link to="/dmca" className="app-link text-sm">
+              DMCA / Copyright
+            </Link>
+          </div>
         </div>
       </footer>
     </div>
@@ -49,6 +55,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/dmca" element={<DmcaPolicy />} />
           <Route path="/v/:shareToken" element={<WatchVideo />} />
           <Route path="/upload" element={<Navigate to="/studio/upload" replace />} />
           <Route path="/videos" element={<Navigate to="/studio/videos" replace />} />

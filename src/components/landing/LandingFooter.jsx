@@ -70,8 +70,8 @@ export default function LandingFooter() {
           <p className="text-sm text-[var(--muted)]">© 2026 MastPlayer. All rights reserved.</p>
           <div className="flex flex-wrap gap-4">
             <FooterLink to="/privacy">Privacy Policy</FooterLink>
+            <FooterLink to="/dmca">DMCA / Copyright</FooterLink>
             <FooterText>Terms</FooterText>
-            <FooterText>Content Policy</FooterText>
           </div>
         </div>
       </div>
