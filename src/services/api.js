@@ -98,6 +98,13 @@ export const fetchTelegramPublications = (videoId) =>
 export const retryTelegramPublication = (id) =>
   api.post(`/telegram/publications/${id}/retry`);
 
+/** MP2MP Link Converter Bot */
+export const fetchMp2mpStatus = () => api.get('/telegram/mp2mp/status');
+
+export const createMp2mpConnectionKey = () => api.post('/telegram/mp2mp/connection-key');
+
+export const disconnectMp2mp = () => api.delete('/telegram/mp2mp/disconnect');
+
 export const fetchPayoutWallet = () => api.get('/payouts/wallet');
 
 export const updatePayoutMethods = (payload) => api.patch('/payouts/methods', payload);

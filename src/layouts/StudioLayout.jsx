@@ -10,6 +10,7 @@ import {
   Gift,
   Sparkles,
   MessageCircle,
+  Bot,
   Wallet,
   Shield,
 } from 'lucide-react';
@@ -25,6 +26,7 @@ const baseNav = [
   { to: '/studio/og-earn', label: 'OG Earn', icon: Sparkles },
   { to: '/studio/payouts', label: 'Payouts', icon: Wallet },
   { to: '/studio/telegram', label: 'Telegram', icon: MessageCircle },
+  { to: '/studio/mp2mp-bot', label: 'MP2MP Bot', icon: Bot },
   { to: '/studio/profile', label: 'Profile', icon: UserRound },
 ];
 

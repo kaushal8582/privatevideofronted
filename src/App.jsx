@@ -18,6 +18,7 @@ import StudioProfile from './pages/studio/Profile.jsx';
 import StudioReferrals from './pages/studio/Referrals.jsx';
 import StudioOgEarn from './pages/studio/OgEarn.jsx';
 import StudioTelegram from './pages/studio/Telegram.jsx';
+import StudioMp2mpBot from './pages/studio/Mp2mpBot.jsx';
 import StudioPayouts from './pages/studio/Payouts.jsx';
 import StudioAdminPayouts from './pages/studio/AdminPayouts.jsx';
 
@@ -77,6 +78,7 @@ export default function App() {
           <Route path="referrals" element={<StudioReferrals />} />
           <Route path="og-earn" element={<StudioOgEarn />} />
           <Route path="telegram" element={<StudioTelegram />} />
+          <Route path="mp2mp-bot" element={<StudioMp2mpBot />} />
           <Route path="payouts" element={<StudioPayouts />} />
           <Route path="admin/payouts" element={<StudioAdminPayouts />} />
           <Route path="profile" element={<StudioProfile />} />
