@@ -100,6 +100,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
@@ -114,10 +115,12 @@ body {
     var(--background);
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.2s ease, color 0.2s ease;
+  overflow-x: clip;
 }
 
 #root {
   min-height: 100vh;
+  overflow-x: clip;
 }
 
 ::selection {
@@ -132,6 +135,12 @@ body {
   background: transparent;
 }
 
+.landing-page {
+  overflow-x: clip;
+  width: 100%;
+  max-width: 100vw;
+}
+
 .landing-container,
 .app-container {
   width: 100%;
@@ -141,7 +150,23 @@ body {
 }
 
 .landing-section {
-  scroll-margin-top: 5rem;
+  scroll-margin-top: 4.5rem;
+}
+
+@media (min-width: 640px) {
+  .landing-section {
+    scroll-margin-top: 5rem;
+  }
+}
+
+/* Fluid section titles used across landing */
+.landing-heading {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--foreground);
 }
 
 /* Brand gradient utilities */

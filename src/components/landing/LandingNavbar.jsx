@@ -34,6 +34,14 @@ export default function LandingNavbar() {
     };
   }, [open]);
 
+  useEffect(() => {
+    const onResize = () => {
+      if (window.matchMedia('(min-width: 1024px)').matches) setOpen(false);
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   const navClick = (href) => {
     setOpen(false);
     scrollToHash(href);
@@ -43,19 +51,19 @@ export default function LandingNavbar() {
     <header
       className={[
         'sticky top-0 z-50 transition-all duration-300',
-        scrolled ? 'app-nav-scrolled' : 'bg-transparent',
+        scrolled || open ? 'app-nav-scrolled' : 'bg-transparent',
       ].join(' ')}
     >
-      <div className="landing-container px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        <Link to="/" className="flex items-center gap-2.5 min-w-0 group" onClick={() => navClick('#top')}>
+      <div className="landing-container px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-3">
+        <Link to="/" className="flex items-center gap-2 sm:gap-2.5 min-w-0 group" onClick={() => navClick('#top')}>
           <img
             src="/favicon.png"
             alt=""
-            className="w-8 h-8 rounded-lg object-cover"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-cover shrink-0"
             width={32}
             height={32}
           />
-          <span className="font-[family-name:var(--font-display)] text-lg sm:text-xl font-bold text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors">
+          <span className="font-[family-name:var(--font-display)] text-base sm:text-xl font-bold text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors truncate">
             MastPlayer
           </span>
         </Link>
@@ -100,11 +108,11 @@ export default function LandingNavbar() {
           )}
         </div>
 
-        <div className="lg:hidden flex items-center gap-2">
+        <div className="lg:hidden flex items-center gap-1.5 sm:gap-2 shrink-0">
           <ThemeToggle />
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--foreground)]"
+            className="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--foreground)]"
             aria-expanded={open}
             aria-controls="landing-mobile-nav"
             aria-label={open ? 'Close menu' : 'Open menu'}
@@ -118,7 +126,7 @@ export default function LandingNavbar() {
       {open ? (
         <nav
           id="landing-mobile-nav"
-          className="lg:hidden border-t border-[var(--border)] bg-[var(--surface)] px-4 py-4 space-y-1"
+          className="lg:hidden border-t border-[var(--border)] bg-[var(--surface)] px-4 py-4 space-y-1 max-h-[calc(100dvh-3.5rem)] overflow-y-auto overscroll-contain"
           aria-label="Mobile"
         >
           {NAV_LINKS.map(({ label, href }) => (

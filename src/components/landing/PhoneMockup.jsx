@@ -3,7 +3,7 @@ import { Copy, Play, Share2 } from 'lucide-react';
 export default function PhoneMockup() {
   return (
     <div
-      className="relative mx-auto w-[min(100%,260px)] aspect-[9/19] rounded-[2rem] border border-[var(--border-green)] bg-[var(--surface)] p-2 shadow-[0_24px_60px_-20px_var(--glow-cyan)] landing-float"
+      className="relative mx-auto w-full max-w-[260px] aspect-[9/19] rounded-[2rem] border border-[var(--border-green)] bg-[var(--surface)] p-2 shadow-[0_24px_60px_-20px_var(--glow-cyan)] landing-float"
       aria-hidden
     >
       <div className="h-full rounded-[1.5rem] border border-[var(--border)] bg-[var(--background)] overflow-hidden flex flex-col">

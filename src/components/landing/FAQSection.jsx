@@ -9,9 +9,9 @@ export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
-    <SectionShell id="faq" className="py-16 sm:py-24">
+    <SectionShell id="faq" className="py-12 sm:py-16 lg:py-24">
       <Reveal>
-        <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl font-bold text-center text-[var(--foreground)] mb-12">
+        <h2 className="landing-heading text-center mb-8 sm:mb-12">
           Frequently Asked Questions
         </h2>
       </Reveal>
@@ -30,12 +30,12 @@ export default function FAQSection() {
                   aria-expanded={open}
                   aria-controls={panelId}
                   onClick={() => setOpenIndex(open ? -1 : i)}
-                  className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left text-sm sm:text-base font-semibold text-[var(--foreground)] hover:bg-[var(--surface-elevated)] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--primary)]"
+                  className="w-full flex items-start sm:items-center justify-between gap-3 sm:gap-4 px-4 sm:px-5 py-3.5 sm:py-4 text-left text-sm sm:text-base font-semibold text-[var(--foreground)] hover:bg-[var(--surface-elevated)] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--primary)]"
                 >
-                  {item.q}
+                  <span className="min-w-0 break-words">{item.q}</span>
                   <ChevronDown
                     className={[
-                      'w-5 h-5 shrink-0 text-[var(--muted)] transition-transform duration-300',
+                      'w-5 h-5 shrink-0 text-[var(--muted)] transition-transform duration-300 mt-0.5 sm:mt-0',
                       open ? 'rotate-180' : '',
                     ].join(' ')}
                     aria-hidden
@@ -51,7 +51,7 @@ export default function FAQSection() {
                   ].join(' ')}
                 >
                   <div className="overflow-hidden">
-                    <p className="px-5 pb-4 text-sm text-[var(--muted)] leading-relaxed">{item.a}</p>
+                    <p className="px-4 sm:px-5 pb-4 text-sm text-[var(--muted)] leading-relaxed">{item.a}</p>
                   </div>
                 </div>
               </div>

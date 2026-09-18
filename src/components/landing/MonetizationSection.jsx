@@ -22,23 +22,23 @@ const CARDS = [
 
 export default function MonetizationSection() {
   return (
-    <SectionShell id="monetization" className="py-16 sm:py-24 bg-[var(--surface)] border-y border-[var(--border)]">
+    <SectionShell id="monetization" className="py-12 sm:py-16 lg:py-24 bg-[var(--surface)] border-y border-[var(--border)]">
       <Reveal>
-        <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold text-[var(--foreground)] text-center max-w-3xl mx-auto mb-4">
+        <h2 className="landing-heading text-center max-w-3xl mx-auto mb-3 sm:mb-4">
           Turn Your Audience Into Opportunity
         </h2>
-        <p className="text-center text-sm text-[var(--muted)] max-w-2xl mx-auto mb-12 leading-relaxed">
+        <p className="text-center text-sm text-[var(--muted)] max-w-2xl mx-auto mb-8 sm:mb-12 leading-relaxed px-1">
           Monetization availability and earnings may vary based on eligibility, traffic, region and
           advertising demand.
         </p>
       </Reveal>
 
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
         {CARDS.map(({ icon: Icon, title, body }, i) => (
           <Reveal key={title} delay={i * 70}>
-            <article className="rounded-2xl border border-[var(--border-green)] bg-[var(--surface-elevated)] p-6 h-full">
+            <article className="rounded-2xl border border-[var(--border-green)] bg-[var(--surface-elevated)] p-5 sm:p-6 h-full">
               <Icon className="w-7 h-7 text-[var(--primary)] mb-4" />
-              <h3 className="text-lg font-semibold text-[var(--foreground)] mb-2">{title}</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-[var(--foreground)] mb-2">{title}</h3>
               <p className="text-sm text-[var(--muted)] leading-relaxed">{body}</p>
             </article>
           </Reveal>

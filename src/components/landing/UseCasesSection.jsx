@@ -22,18 +22,18 @@ const CASES = [
 
 export default function UseCasesSection() {
   return (
-    <SectionShell id="use-cases" className="py-16 sm:py-24">
+    <SectionShell id="use-cases" className="py-12 sm:py-16 lg:py-24">
       <Reveal>
-        <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl font-bold text-center text-[var(--foreground)] mb-12">
+        <h2 className="landing-heading text-center mb-8 sm:mb-12">
           Real Ways Creators Use MastPlayer
         </h2>
       </Reveal>
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
         {CASES.map(({ icon: Icon, title, body }, i) => (
           <Reveal key={title} delay={i * 70}>
-            <article className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 h-full">
+            <article className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 sm:p-6 h-full">
               <Icon className="w-7 h-7 text-[var(--primary)] mb-4" />
-              <h3 className="text-lg font-semibold text-[var(--foreground)] mb-2">{title}</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-[var(--foreground)] mb-2">{title}</h3>
               <p className="text-sm text-[var(--muted)] leading-relaxed">{body}</p>
             </article>
           </Reveal>

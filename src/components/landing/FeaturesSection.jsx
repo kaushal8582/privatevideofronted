@@ -46,14 +46,22 @@ const FEATURES = [
 function FeatureVisual({ type }) {
   if (type === 'dashboard') return <DashboardMockup />;
   if (type === 'share') return <ShareLinkDemo />;
-  if (type === 'phone') return <PhoneMockup />;
+  if (type === 'phone') {
+    return (
+      <div className="flex justify-center">
+        <div className="w-[min(100%,240px)]">
+          <PhoneMockup />
+        </div>
+      </div>
+    );
+  }
   if (type === 'analytics') {
     return (
-      <div className="grid grid-cols-2 gap-3" aria-hidden>
+      <div className="grid grid-cols-2 gap-2 sm:gap-3" aria-hidden>
         {['Total Views', 'Payable Views', 'Watch Time', 'Completion'].map((label, i) => (
-          <div key={label} className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-4">
-            <p className="text-[10px] uppercase tracking-wide text-[var(--muted)]">{label}</p>
-            <p className="mt-2 text-2xl font-bold text-[var(--foreground)] tabular-nums">
+          <div key={label} className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-3 sm:p-4 min-w-0">
+            <p className="text-[10px] uppercase tracking-wide text-[var(--muted)] truncate">{label}</p>
+            <p className="mt-2 text-xl sm:text-2xl font-bold text-[var(--foreground)] tabular-nums">
               {['2.4k', '186', '48h', '62%'][i]}
             </p>
           </div>
@@ -62,7 +70,7 @@ function FeatureVisual({ type }) {
     );
   }
   return (
-    <div className="rounded-2xl border border-[var(--border-green)] bg-[var(--surface-elevated)] p-6">
+    <div className="rounded-2xl border border-[var(--border-green)] bg-[var(--surface-elevated)] p-5 sm:p-6">
       <Cloud className="w-8 h-8 text-[var(--primary)] mb-3" />
       <p className="text-sm text-[var(--muted)] leading-relaxed">
         Estimated earnings update as qualified app views accrue. Availability may vary by region and demand.
@@ -73,14 +81,14 @@ function FeatureVisual({ type }) {
 
 export default function FeaturesSection() {
   return (
-    <SectionShell id="features" className="py-16 sm:py-24 bg-[var(--surface)] border-y border-[var(--border)]">
+    <SectionShell id="features" className="py-12 sm:py-16 lg:py-24 bg-[var(--surface)] border-y border-[var(--border)]">
       <Reveal>
-        <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold text-[var(--foreground)] text-center max-w-3xl mx-auto mb-14 sm:mb-20">
+        <h2 className="landing-heading text-center max-w-3xl mx-auto mb-10 sm:mb-14 lg:mb-20">
           Everything You Need to Manage Your Videos
         </h2>
       </Reveal>
 
-      <div className="space-y-16 sm:space-y-24">
+      <div className="space-y-12 sm:space-y-16 lg:space-y-24">
         {FEATURES.map((feature, i) => {
           const Icon = feature.badge;
           const reverse = feature.reverse;
@@ -88,18 +96,18 @@ export default function FeaturesSection() {
             <Reveal key={feature.title} delay={i * 40}>
               <div
                 className={[
-                  'grid lg:grid-cols-2 gap-10 lg:gap-16 items-center',
+                  'grid lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 items-center',
                   reverse ? 'lg:[direction:rtl] lg:*:[direction:ltr]' : '',
                 ].join(' ')}
               >
-                <div>
+                <div className="min-w-0">
                   <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border-green)] bg-[var(--accent-soft)] text-[var(--primary)] mb-4">
                     <Icon className="w-5 h-5" />
                   </span>
-                  <h3 className="font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-bold text-[var(--foreground)] mb-4">
+                  <h3 className="font-[family-name:var(--font-display)] text-xl sm:text-2xl lg:text-3xl font-bold text-[var(--foreground)] mb-3 sm:mb-4">
                     {feature.title}
                   </h3>
-                  <p className="text-[var(--muted)] leading-relaxed mb-6">{feature.body}</p>
+                  <p className="text-sm sm:text-base text-[var(--muted)] leading-relaxed mb-5 sm:mb-6">{feature.body}</p>
                   {feature.cta ? (
                     feature.cta.hash ? (
                       <a
@@ -118,7 +126,9 @@ export default function FeaturesSection() {
                     )
                   ) : null}
                 </div>
-                <FeatureVisual type={feature.visual} />
+                <div className="min-w-0 w-full">
+                  <FeatureVisual type={feature.visual} />
+                </div>
               </div>
             </Reveal>
           );

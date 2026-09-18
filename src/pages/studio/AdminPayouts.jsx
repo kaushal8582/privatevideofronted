@@ -14,7 +14,7 @@ import { formatDate, formatUsd } from '../../utils/formatters.js';
 
 export default function StudioAdminPayouts() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = ['admin', 'super_admin', 'finance'].includes(user?.role);
   const [status, setStatus] = useState('pending');
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);

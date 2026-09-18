@@ -5,7 +5,7 @@ export default function SectionShell({ id, className = '', children, ariaLabelle
       aria-labelledby={ariaLabelledBy}
       className={`landing-section px-4 sm:px-6 lg:px-8 ${className}`}
     >
-      <div className="landing-container">{children}</div>
+      <div className="landing-container min-w-0">{children}</div>
     </section>
   );
 }

@@ -44,7 +44,8 @@ export default function StudioLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const nav = useMemo(() => {
-    if (user?.role === 'admin') {
+    // Legacy Studio payouts UI — staff with finance/admin roles
+    if (['admin', 'super_admin', 'finance'].includes(user?.role)) {
       return [
         ...baseNav,
         { to: '/studio/admin/payouts', label: 'Admin payouts', icon: Shield },

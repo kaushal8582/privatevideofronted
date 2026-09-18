@@ -17,7 +17,7 @@ import FinalCTA from '../components/landing/FinalCTA.jsx';
 
 export default function Landing() {
   return (
-    <div className="landing-page min-h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)]">
+    <div className="landing-page min-h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)] overflow-x-clip">
       <LandingNavbar />
       <main className="flex-1">
         <HeroSection />
