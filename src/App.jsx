@@ -20,17 +20,16 @@ import StudioOgEarn from './pages/studio/OgEarn.jsx';
 import StudioTelegram from './pages/studio/Telegram.jsx';
 import StudioMp2mpBot from './pages/studio/Mp2mpBot.jsx';
 import StudioPayouts from './pages/studio/Payouts.jsx';
-import StudioAdminPayouts from './pages/studio/AdminPayouts.jsx';
 
 function MarketingShell() {
   return (
-    <div className="app-shell min-h-screen flex flex-col">
+    <div className="app-shell min-h-screen flex flex-col overflow-x-clip">
       <Navbar />
-      <main className="flex-1 w-full">
+      <main className="flex-1 w-full min-w-0">
         <Outlet />
       </main>
-      <footer className="border-t border-[var(--border)] py-6">
-        <div className="app-container px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-3 text-sm app-muted">
+      <footer className="border-t border-[var(--border)] py-4 sm:py-6">
+        <div className="app-container px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 text-sm app-muted">
           <span>© {new Date().getFullYear()} MastPlayer</span>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <Link to="/privacy" className="app-link text-sm">
@@ -80,7 +79,6 @@ export default function App() {
           <Route path="telegram" element={<StudioTelegram />} />
           <Route path="mp2mp-bot" element={<StudioMp2mpBot />} />
           <Route path="payouts" element={<StudioPayouts />} />
-          <Route path="admin/payouts" element={<StudioAdminPayouts />} />
           <Route path="profile" element={<StudioProfile />} />
         </Route>
       </Routes>

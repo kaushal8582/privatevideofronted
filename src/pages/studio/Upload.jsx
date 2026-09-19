@@ -228,7 +228,7 @@ export default function StudioUpload() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="app-kicker mb-1">Creator Studio</p>
-          <h1 className="app-title text-2xl sm:text-3xl">Upload video</h1>
+          <h1 className="app-title text-2xl sm:text-3xl">Upload</h1>
         </div>
         {isUploading ? (
           <span className="rounded-full border border-[var(--border-accent)] bg-[var(--accent-soft)] px-3 py-1 text-xs font-semibold text-[var(--primary)]">
@@ -429,7 +429,7 @@ export default function StudioUpload() {
                     </ul>
                   ) : (
                     <p className="text-sm app-muted rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-3">
-                      Turn on to post this video to your groups or channels.
+                      Turn on to post this upload to your groups or channels.
                     </p>
                   )}
                 </div>

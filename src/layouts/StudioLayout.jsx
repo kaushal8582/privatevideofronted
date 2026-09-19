@@ -12,14 +12,13 @@ import {
   MessageCircle,
   Bot,
   Wallet,
-  Shield,
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 
-const baseNav = [
-  { to: '/studio', end: true, label: 'Overview', icon: LayoutDashboard },
+const nav = [
+  { to: '/studio', end: true, label: 'Dashboard', icon: LayoutDashboard },
   { to: '/studio/videos', label: 'Videos', icon: Video },
   { to: '/studio/upload', label: 'Upload', icon: Upload },
   { to: '/studio/referrals', label: 'Referrals', icon: Gift },
@@ -42,17 +41,6 @@ export default function StudioLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  const nav = useMemo(() => {
-    // Legacy Studio payouts UI — staff with finance/admin roles
-    if (['admin', 'super_admin', 'finance'].includes(user?.role)) {
-      return [
-        ...baseNav,
-        { to: '/studio/admin/payouts', label: 'Admin payouts', icon: Shield },
-      ];
-    }
-    return baseNav;
-  }, [user?.role]);
 
   const handleLogout = () => {
     logout();
@@ -156,8 +144,24 @@ export default function StudioLayout() {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <p className="font-[family-name:var(--font-display)] text-xl">Studio</p>
-            <ThemeToggle />
+            <Link
+              to="/studio/profile"
+              className="inline-flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border border-[var(--border)] bg-[var(--surface)] shrink-0"
+              aria-label="Open profile"
+            >
+              {user?.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt=""
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <span className="w-full h-full flex items-center justify-center text-sm font-semibold text-[var(--primary)] bg-[var(--accent-medium)]">
+                  {(user?.name || '?').charAt(0).toUpperCase()}
+                </span>
+              )}
+            </Link>
           </div>
         </header>
 

@@ -1,8 +1,17 @@
 import { useRef, useState } from 'react';
-import { Upload, X, Film } from 'lucide-react';
-import { formatFileSize, getFileExtension, validateClientVideo } from '../utils/formatters.js';
+import { Upload, X, Film, Image as ImageIcon } from 'lucide-react';
+import {
+  formatFileSize,
+  getFileExtension,
+  isClientImageFile,
+  validateClientMedia,
+} from '../utils/formatters.js';
 
-const MAX_MB = Number(import.meta.env.VITE_MAX_VIDEO_SIZE_MB) || 500;
+const MAX_VIDEO_MB = Number(import.meta.env.VITE_MAX_VIDEO_SIZE_MB) || 500;
+const MAX_IMAGE_MB = Number(import.meta.env.VITE_MAX_IMAGE_SIZE_MB) || 25;
+
+const ACCEPT =
+  'video/mp4,video/webm,video/quicktime,video/x-matroska,.mp4,.webm,.mov,.mkv,image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif';
 
 export default function UploadZone({
   file,
@@ -18,7 +27,7 @@ export default function UploadZone({
     const next = fileList?.[0];
     if (!next) return;
 
-    const error = validateClientVideo(next, MAX_MB);
+    const error = validateClientMedia(next, MAX_VIDEO_MB, MAX_IMAGE_MB);
     if (error) {
       setLocalError(error);
       return;
@@ -48,6 +57,8 @@ export default function UploadZone({
     setDragActive(false);
   };
 
+  const isImage = file ? isClientImageFile(file) : false;
+
   return (
     <div className="space-y-3">
       {!file ? (
@@ -75,7 +86,7 @@ export default function UploadZone({
           <input
             ref={inputRef}
             type="file"
-            accept="video/mp4,video/webm,video/quicktime,video/x-matroska,.mp4,.webm,.mov,.mkv"
+            accept={ACCEPT}
             className="sr-only"
             disabled={disabled}
             onChange={(e) => handleFiles(e.target.files)}
@@ -85,10 +96,11 @@ export default function UploadZone({
           </span>
           <div className="text-center sm:text-left min-w-0 flex-1">
             <p className="text-base font-semibold text-[var(--foreground)]">
-              Drop your video here
+              Drop video or image here
             </p>
             <p className="mt-1 text-sm app-muted">
-              or click to browse · MP4, WebM, MOV, MKV · up to {MAX_MB} MB
+              Video up to {MAX_VIDEO_MB} MB · Image up to {MAX_IMAGE_MB} MB · MP4, WebM, MOV, MKV,
+              JPG, PNG, WEBP, GIF
             </p>
           </div>
           <span className="app-btn-primary self-center sm:self-auto shrink-0 pointer-events-none">
@@ -108,13 +120,13 @@ export default function UploadZone({
           <input
             ref={inputRef}
             type="file"
-            accept="video/mp4,video/webm,video/quicktime,video/x-matroska,.mp4,.webm,.mov,.mkv"
+            accept={ACCEPT}
             className="sr-only"
             disabled={disabled}
             onChange={(e) => handleFiles(e.target.files)}
           />
           <div className="shrink-0 w-11 h-11 rounded-xl bg-[var(--accent-medium)] text-[var(--primary)] flex items-center justify-center">
-            <Film className="w-5 h-5" />
+            {isImage ? <ImageIcon className="w-5 h-5" /> : <Film className="w-5 h-5" />}
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold truncate" title={file.name}>
@@ -122,6 +134,7 @@ export default function UploadZone({
             </p>
             <p className="text-xs app-muted mt-0.5">
               {formatFileSize(file.size)} · {getFileExtension(file.name)}
+              {isImage ? ' · Image' : ' · Video'}
             </p>
           </div>
           {!disabled && (

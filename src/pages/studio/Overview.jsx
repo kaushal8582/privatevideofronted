@@ -4,7 +4,6 @@ import {
   Eye,
   DollarSign,
   Video,
-  BadgeCheck,
   Upload,
   ArrowRight,
   Copy,
@@ -12,7 +11,6 @@ import {
 import toast from 'react-hot-toast';
 import { fetchDashboardStats, getFriendlyError } from '../../services/api.js';
 import { formatCount, formatDate, formatDuration, formatUsd } from '../../utils/formatters.js';
-import { useAuth } from '../../context/AuthContext.jsx';
 
 function StatCard({ icon: Icon, label, value, hint, accent = 'green' }) {
   const iconClass =
@@ -41,7 +39,6 @@ function StatCard({ icon: Icon, label, value, hint, accent = 'green' }) {
 }
 
 export default function StudioOverview() {
-  const { user } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -78,12 +75,7 @@ export default function StudioOverview() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <p className="app-kicker mb-1">Creator Studio</p>
-          <h1 className="app-title">Overview</h1>
-          <p className="mt-2 app-subtitle">
-            Welcome back{user?.name ? `, ${user.name}` : ''}. App views only — web previews don’t
-            count.
-          </p>
+          <h1 className="app-title">Dashboard</h1>
         </div>
         <Link to="/studio/upload" className="app-btn-primary">
           <Upload className="w-4 h-4" />
@@ -92,8 +84,8 @@ export default function StudioOverview() {
       </div>
 
       {loading && (
-        <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
+        <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="h-28 rounded-2xl app-card animate-pulse bg-[var(--surface)]" />
           ))}
         </div>
@@ -103,7 +95,7 @@ export default function StudioOverview() {
 
       {!loading && stats && (
         <>
-          <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
             <StatCard
               icon={Video}
               label="Videos"
@@ -113,21 +105,15 @@ export default function StudioOverview() {
             />
             <StatCard
               icon={Eye}
-              label="App views"
-              value={formatCount(stats.totalAppViews)}
-              hint="Counted plays in the app"
-            />
-            <StatCard
-              icon={BadgeCheck}
-              label="Payable views"
+              label="Views"
               value={formatCount(stats.payableViews)}
-              hint="≥1 min watch, 1 / device / day"
+              hint="App plays that count"
             />
             <StatCard
               icon={DollarSign}
               label="Est. earnings"
               value={formatUsd(stats.estimatedEarningsUsd)}
-              hint={`$${stats.usdPerThousand} per 1,000 payable views`}
+              hint={`$${stats.usdPerThousand} per 1,000 views`}
               accent="amber"
             />
           </div>
@@ -136,7 +122,7 @@ export default function StudioOverview() {
             <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-[var(--border)]">
               <div>
                 <h2 className="text-lg font-semibold text-[var(--foreground)]">Recent videos</h2>
-                <p className="text-sm app-muted">Latest uploads and their app view stats</p>
+                <p className="text-sm app-muted">Latest uploads and their view stats</p>
               </div>
               <Link to="/studio/videos" className="app-link inline-flex items-center gap-1 text-sm">
                 View all <ArrowRight className="w-4 h-4" />
@@ -157,7 +143,6 @@ export default function StudioOverview() {
                     <tr>
                       <th className="px-5 sm:px-6">Video</th>
                       <th>Views</th>
-                      <th>Payable</th>
                       <th className="hidden sm:table-cell">Uploaded</th>
                       <th className="px-5 sm:px-6 text-right">Link</th>
                     </tr>
@@ -178,9 +163,8 @@ export default function StudioOverview() {
                             </div>
                           </div>
                         </td>
-                        <td className="tabular-nums font-medium">{formatCount(v.viewCount)}</td>
-                        <td className="tabular-nums font-medium text-[var(--primary)]">
-                          {formatCount(v.payableViewCount)}
+                        <td className="tabular-nums font-medium">
+                          {formatCount(v.payableViewCount ?? v.viewCount)}
                         </td>
                         <td className="app-muted hidden sm:table-cell">{formatDate(v.createdAt)}</td>
                         <td className="px-5 sm:px-6 text-right">

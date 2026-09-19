@@ -202,12 +202,18 @@ export async function uploadVideoChunked(file, onProgress, signal, options = {})
     );
     await Promise.all(pool);
 
-    const meta = await readLocalVideoMeta(file);
+    const isImage = String(file.type || '').startsWith('image/');
+    const meta = isImage
+      ? { duration: null, thumbnailBlob: null }
+      : await readLocalVideoMeta(file);
     let hasThumbnail = false;
 
     let thumbBlob = null;
     if (customThumbnailFile) {
       thumbBlob = await imageFileToJpegBlob(customThumbnailFile);
+    }
+    if (!thumbBlob && isImage) {
+      thumbBlob = await imageFileToJpegBlob(file);
     }
     if (!thumbBlob) {
       thumbBlob = meta.thumbnailBlob;

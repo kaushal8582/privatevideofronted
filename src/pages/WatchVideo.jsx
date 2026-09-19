@@ -170,6 +170,10 @@ export default function WatchVideo() {
   const royalty = video.ogEarn?.royaltyPercent ?? 10;
   const ownerShare = video.ogEarn?.ownerSharePercent ?? 90;
   const showOgEarn = video.ogEarn?.enabled !== false && !isOriginalCreator;
+  const isImage = video.mediaType === 'image';
+  const previewUrl = isImage
+    ? video.videoUrl || video.thumbnailUrl
+    : video.thumbnailUrl;
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
@@ -182,35 +186,39 @@ export default function WatchVideo() {
       </div>
 
       <div className="relative aspect-video rounded-2xl overflow-hidden border border-[var(--border-green)] bg-[var(--surface)]">
-        {video.thumbnailUrl ? (
+        {previewUrl ? (
           <img
-            src={video.thumbnailUrl}
+            src={previewUrl}
             alt=""
-            className="absolute inset-0 w-full h-full object-cover"
+            className={`absolute inset-0 w-full h-full ${isImage ? 'object-contain bg-black' : 'object-cover'}`}
           />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-[var(--surface)] to-[var(--background)]" />
         )}
-        <div className="absolute inset-0 bg-black/35" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4 text-center">
-          <button
-            type="button"
-            onClick={openInApp}
-            disabled={openingApp}
-            className="inline-flex items-center justify-center gap-2 rounded-full app-btn-primary app-btn-primary-lg !rounded-full shadow-[0_0_32px_var(--glow-cyan)] disabled:opacity-70"
-          >
-            <Play className="w-5 h-5 fill-white" />
-            {openingApp ? 'Opening…' : 'View in App'}
-          </button>
-          <p className="text-sm text-white/80 max-w-sm">
-            Open in Mast Player to watch. If the app isn’t installed, you’ll go to the Play Store.
-          </p>
-        </div>
-        {video.duration != null && (
-          <span className="absolute bottom-3 right-3 rounded-lg bg-black/70 text-white text-xs font-semibold px-2 py-1">
-            {formatDuration(video.duration)}
-          </span>
-        )}
+        {!isImage ? (
+          <>
+            <div className="absolute inset-0 bg-black/35" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4 text-center">
+              <button
+                type="button"
+                onClick={openInApp}
+                disabled={openingApp}
+                className="inline-flex items-center justify-center gap-2 rounded-full app-btn-primary app-btn-primary-lg !rounded-full shadow-[0_0_32px_var(--glow-cyan)] disabled:opacity-70"
+              >
+                <Play className="w-5 h-5 fill-white" />
+                {openingApp ? 'Opening…' : 'View in App'}
+              </button>
+              <p className="text-sm text-white/80 max-w-sm">
+                Open in Mast Player to watch. If the app isn’t installed, you’ll go to the Play Store.
+              </p>
+            </div>
+            {video.duration != null && (
+              <span className="absolute bottom-3 right-3 rounded-lg bg-black/70 text-white text-xs font-semibold px-2 py-1">
+                {formatDuration(video.duration)}
+              </span>
+            )}
+          </>
+        ) : null}
       </div>
 
       <div className="flex flex-wrap items-center gap-3">

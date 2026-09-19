@@ -27,6 +27,7 @@ function loadGisScript() {
 
 /**
  * Official Google Identity button. Calls onCredential(idToken).
+ * Width follows the container so it stays responsive on small phones.
  */
 export default function GoogleSignInButton({
   onCredential,
@@ -34,9 +35,30 @@ export default function GoogleSignInButton({
   text = 'continue_with',
   disabled = false,
 }) {
+  const wrapRef = useRef(null);
   const btnRef = useRef(null);
   const [ready, setReady] = useState(false);
   const [unavailable, setUnavailable] = useState(!CLIENT_ID);
+  const [btnWidth, setBtnWidth] = useState(320);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return undefined;
+
+    const measure = () => {
+      const w = Math.floor(el.getBoundingClientRect().width);
+      if (w > 0) setBtnWidth(Math.min(400, Math.max(240, w)));
+    };
+
+    measure();
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
+    ro?.observe(el);
+    window.addEventListener('resize', measure);
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, []);
 
   useEffect(() => {
     if (!CLIENT_ID || disabled) return undefined;
@@ -67,7 +89,7 @@ export default function GoogleSignInButton({
           size: 'large',
           text,
           shape: 'pill',
-          width: 320,
+          width: btnWidth,
         });
         setReady(true);
       } catch (err) {
@@ -82,26 +104,24 @@ export default function GoogleSignInButton({
     return () => {
       cancelled = true;
     };
-  }, [onCredential, onError, text, disabled]);
+  }, [onCredential, onError, text, disabled, btnWidth]);
 
   if (unavailable) {
     return (
-      <p className="text-center text-xs app-muted">
+      <p className="text-center text-xs app-muted px-1">
         Google sign-in is not configured yet. Set <code>VITE_GOOGLE_CLIENT_ID</code>.
       </p>
     );
   }
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div ref={wrapRef} className="w-full flex flex-col items-stretch gap-2">
       <div
         ref={btnRef}
-        className={disabled ? 'pointer-events-none opacity-50' : ''}
+        className={`w-full flex justify-center overflow-hidden ${disabled ? 'pointer-events-none opacity-50' : ''}`}
         aria-label="Continue with Google"
       />
-      {!ready && (
-        <p className="text-xs app-muted">Loading Google…</p>
-      )}
+      {!ready && <p className="text-xs app-muted text-center">Loading Google…</p>}
     </div>
   );
 }

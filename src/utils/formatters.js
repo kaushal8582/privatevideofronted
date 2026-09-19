@@ -60,6 +60,16 @@ const ALLOWED_MIME = [
 
 const ALLOWED_EXT = ['.mp4', '.webm', '.mov', '.mkv'];
 
+const ALLOWED_IMAGE_MIME = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+];
+
+const ALLOWED_IMAGE_EXT = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+
 export const validateClientVideo = (file, maxSizeMb = 500) => {
   if (!file) return 'Please select a video file.';
 
@@ -77,4 +87,36 @@ export const validateClientVideo = (file, maxSizeMb = 500) => {
   }
 
   return null;
+};
+
+export const validateClientMedia = (file, maxVideoMb = 500, maxImageMb = 25) => {
+  if (!file) return 'Please select a video or image.';
+
+  const name = String(file.name || '').toLowerCase();
+  const isImage =
+    ALLOWED_IMAGE_EXT.some((ext) => name.endsWith(ext)) ||
+    (file.type && ALLOWED_IMAGE_MIME.includes(file.type));
+  const isVideo =
+    ALLOWED_EXT.some((ext) => name.endsWith(ext)) ||
+    (file.type && ALLOWED_MIME.includes(file.type));
+
+  if (!isImage && !isVideo) {
+    return 'Unsupported format. Use MP4, WebM, MOV, MKV, JPG, PNG, WEBP, or GIF.';
+  }
+
+  const maxMb = isImage ? maxImageMb : maxVideoMb;
+  if (file.size > maxMb * 1024 * 1024) {
+    return `File too large. Maximum size is ${maxMb} MB.`;
+  }
+
+  return null;
+};
+
+export const isClientImageFile = (file) => {
+  if (!file) return false;
+  const name = String(file.name || '').toLowerCase();
+  return (
+    ALLOWED_IMAGE_EXT.some((ext) => name.endsWith(ext)) ||
+    (file.type && ALLOWED_IMAGE_MIME.includes(file.type))
+  );
 };

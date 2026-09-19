@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Upload, Trash2, Copy, ExternalLink, Eye, BadgeCheck } from 'lucide-react';
+import { Upload, Trash2, Copy, ExternalLink, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
 import useVideos from '../../hooks/useVideos.js';
 import EmptyState from '../../components/EmptyState.jsx';
@@ -80,11 +80,6 @@ export default function StudioVideos() {
                     <Eye className="w-3.5 h-3.5" /> Views
                   </span>
                 </th>
-                <th>
-                  <span className="inline-flex items-center gap-1">
-                    <BadgeCheck className="w-3.5 h-3.5" /> Payable
-                  </span>
-                </th>
                 <th>Size</th>
                 <th>Uploaded</th>
                 <th className="px-5 text-right">Actions</th>
@@ -116,9 +111,8 @@ export default function StudioVideos() {
                         </div>
                       </div>
                     </td>
-                    <td className="tabular-nums font-medium">{formatCount(video.viewCount)}</td>
-                    <td className="tabular-nums font-medium text-[var(--primary)]">
-                      {formatCount(video.payableViewCount)}
+                    <td className="tabular-nums font-medium">
+                      {formatCount(video.payableViewCount ?? video.viewCount)}
                     </td>
                     <td className="app-muted">{formatFileSize(video.size)}</td>
                     <td className="app-muted">{formatDate(video.createdAt)}</td>
