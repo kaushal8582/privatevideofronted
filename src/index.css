@@ -380,6 +380,8 @@ body {
   border: 1px solid var(--border);
   background: var(--surface-elevated);
   overflow: hidden;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .app-table {

@@ -141,16 +141,22 @@ export default function StudioOverview() {
                 <table className="app-table">
                   <thead>
                     <tr>
-                      <th className="px-5 sm:px-6">Video</th>
+                      <th className="px-5 sm:px-6">Link</th>
+                      <th>Video</th>
                       <th>Views</th>
-                      <th className="hidden sm:table-cell">Uploaded</th>
-                      <th className="px-5 sm:px-6 text-right">Link</th>
+                      <th className="hidden sm:table-cell px-5 sm:px-6">Uploaded</th>
                     </tr>
                   </thead>
                   <tbody>
                     {stats.recentVideos.map((v) => (
                       <tr key={v.id}>
                         <td className="px-5 sm:px-6">
+                          <button type="button" onClick={() => copyLink(v.shareUrl)} className="app-btn-secondary !py-1.5 !px-2.5 !text-xs">
+                            <Copy className="w-3.5 h-3.5" />
+                            Copy
+                          </button>
+                        </td>
+                        <td>
                           <div className="flex items-center gap-3 min-w-0">
                             <div className="w-14 h-9 rounded-lg overflow-hidden bg-[var(--surface)] border border-[var(--border)] shrink-0">
                               {v.thumbnailUrl ? (
@@ -166,13 +172,7 @@ export default function StudioOverview() {
                         <td className="tabular-nums font-medium">
                           {formatCount(v.payableViewCount ?? v.viewCount)}
                         </td>
-                        <td className="app-muted hidden sm:table-cell">{formatDate(v.createdAt)}</td>
-                        <td className="px-5 sm:px-6 text-right">
-                          <button type="button" onClick={() => copyLink(v.shareUrl)} className="app-btn-secondary !py-1.5 !px-2.5 !text-xs">
-                            <Copy className="w-3.5 h-3.5" />
-                            Copy
-                          </button>
-                        </td>
+                        <td className="app-muted hidden sm:table-cell px-5 sm:px-6">{formatDate(v.createdAt)}</td>
                       </tr>
                     ))}
                   </tbody>

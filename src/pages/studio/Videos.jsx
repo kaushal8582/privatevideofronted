@@ -70,78 +70,85 @@ export default function StudioVideos() {
       {!loading && !error && videos.length === 0 && <EmptyState />}
 
       {!loading && !error && videos.length > 0 && (
-        <div className="app-table-wrap overflow-x-auto">
-          <table className="app-table min-w-[720px]">
-            <thead>
-              <tr>
-                <th className="px-5">Video</th>
-                <th>
-                  <span className="inline-flex items-center gap-1">
-                    <Eye className="w-3.5 h-3.5" /> Views
-                  </span>
-                </th>
-                <th>Size</th>
-                <th>Uploaded</th>
-                <th className="px-5 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {videos.map((video) => {
-                const id = video.id || video._id;
-                const deleting = deletingId === id;
-                return (
-                  <tr key={id}>
-                    <td className="px-5">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-20 h-12 rounded-lg overflow-hidden bg-[var(--surface)] border border-[var(--border)] shrink-0 relative">
-                          <VideoThumbnail
-                            thumbnailUrl={video.thumbnailUrl}
-                            videoUrl={video.videoUrl}
-                            title={video.title}
-                          />
+        <div className="app-table-wrap min-w-0 max-w-full">
+          <div className="overflow-x-auto overscroll-x-contain">
+            <table className="app-table min-w-[720px]">
+              <thead>
+                <tr>
+                  <th className="px-5">Link</th>
+                  <th>Video</th>
+                  <th>
+                    <span className="inline-flex items-center gap-1">
+                      <Eye className="w-3.5 h-3.5" /> Views
+                    </span>
+                  </th>
+                  <th>Size</th>
+                  <th>Uploaded</th>
+                  <th className="px-5 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {videos.map((video) => {
+                  const id = video.id || video._id;
+                  const deleting = deletingId === id;
+                  return (
+                    <tr key={id}>
+                      <td className="px-5">
+                        <div className="flex items-center gap-1.5">
+                          <button type="button" onClick={() => copyLink(video.shareUrl)} className="app-btn-secondary !py-1.5 !px-2.5 !text-xs">
+                            <Copy className="w-3.5 h-3.5" />
+                            Copy
+                          </button>
+                          <Link to={`/v/${video.shareToken}`} className="app-btn-secondary !py-1.5 !px-2.5 !text-xs">
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            Open
+                          </Link>
                         </div>
-                        <div className="min-w-0">
-                          <p className="font-semibold truncate max-w-[18rem]" title={video.title}>
-                            {video.title}
-                          </p>
-                          <p className="text-xs app-muted tabular-nums">
-                            {formatDuration(video.duration)}
-                            {video.category ? ` · ${categoryLabel(video.category)}` : ''}
-                          </p>
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-20 h-12 rounded-lg overflow-hidden bg-[var(--surface)] border border-[var(--border)] shrink-0 relative">
+                            <VideoThumbnail
+                              thumbnailUrl={video.thumbnailUrl}
+                              videoUrl={video.videoUrl}
+                              title={video.title}
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-semibold truncate max-w-[18rem]" title={video.title}>
+                              {video.title}
+                            </p>
+                            <p className="text-xs app-muted tabular-nums">
+                              {formatDuration(video.duration)}
+                              {video.category ? ` · ${categoryLabel(video.category)}` : ''}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="tabular-nums font-medium">
-                      {formatCount(video.payableViewCount ?? video.viewCount)}
-                    </td>
-                    <td className="app-muted">{formatFileSize(video.size)}</td>
-                    <td className="app-muted">{formatDate(video.createdAt)}</td>
-                    <td className="px-5">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button type="button" onClick={() => copyLink(video.shareUrl)} className="app-btn-secondary !py-1.5 !px-2.5 !text-xs">
-                          <Copy className="w-3.5 h-3.5" />
-                          Copy
-                        </button>
-                        <Link to={`/v/${video.shareToken}`} className="app-btn-secondary !py-1.5 !px-2.5 !text-xs">
-                          <ExternalLink className="w-3.5 h-3.5" />
-                          Open
-                        </Link>
-                        <button
-                          type="button"
-                          disabled={deleting}
-                          onClick={() => setPendingDelete(video)}
-                          className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-[var(--danger)] hover:bg-[var(--danger-soft)] disabled:opacity-50"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      </td>
+                      <td className="tabular-nums font-medium">
+                        {formatCount(video.payableViewCount ?? video.viewCount)}
+                      </td>
+                      <td className="app-muted">{formatFileSize(video.size)}</td>
+                      <td className="app-muted">{formatDate(video.createdAt)}</td>
+                      <td className="px-5">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            disabled={deleting}
+                            onClick={() => setPendingDelete(video)}
+                            className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-[var(--danger)] hover:bg-[var(--danger-soft)] disabled:opacity-50"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
