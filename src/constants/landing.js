@@ -3,11 +3,14 @@ export const PLAY_STORE_URL =
 
 export const SITE_URL = 'https://mastplayer.in';
 
+/** Estimated creator rate for qualified app views (must match Backend VIEW_USD_PER_1000). */
+export const USD_PER_1000_VIEWS = 3;
+
 export const NAV_LINKS = [
   { label: 'Home', href: '#top' },
+  { label: 'Monetization', href: '#monetization' },
   { label: 'Features', href: '#features' },
   { label: 'How It Works', href: '#how-it-works' },
-  { label: 'Monetization', href: '#monetization' },
   { label: 'FAQ', href: '#faq' },
 ];
 
@@ -42,7 +45,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: 'How does monetization work?',
-    a: 'Views that qualify in the Mast Player app can count toward estimated creator earnings. Monetization availability and earnings may vary based on eligibility, traffic, region and advertising demand.',
+    a: `Qualified views in the Mast Player app count toward estimated creator earnings at about $${USD_PER_1000_VIEWS} per 1,000 views. Availability and payouts may vary by eligibility, traffic, region, and advertising demand.`,
   },
   {
     q: 'Is there an Android app?',

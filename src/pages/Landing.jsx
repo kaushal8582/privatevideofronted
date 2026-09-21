@@ -21,6 +21,7 @@ export default function Landing() {
       <LandingNavbar />
       <main className="flex-1">
         <HeroSection />
+        <MonetizationSection />
         <ProductFlow />
         <AudienceSection />
         <FeaturesSection />
@@ -29,7 +30,6 @@ export default function Landing() {
         <AnalyticsSection />
         <ComparisonSection />
         <UseCasesSection />
-        <MonetizationSection />
         <SecuritySection />
         <FAQSection />
         <AppDownloadSection />

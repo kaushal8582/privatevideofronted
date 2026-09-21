@@ -20,9 +20,6 @@ import {
 
 const SETTING_FIELDS = [
   { key: 'autoPublish', label: 'Auto publish new videos' },
-  { key: 'deleteLinks', label: 'Delete links in group' },
-  { key: 'searchEnabled', label: 'Movie / video search' },
-  { key: 'adminBypass', label: 'Allow admin links' },
   { key: 'includeThumbnail', label: 'Include thumbnail' },
 ];
 
@@ -215,12 +212,6 @@ export default function StudioTelegram() {
                 <div className="flex flex-wrap gap-1">
                   {d.settings.autoPublish ? (
                     <span className="app-badge app-badge-green !text-[10px]">Auto</span>
-                  ) : null}
-                  {d.settings.deleteLinks ? (
-                    <span className="app-badge !text-[10px]">Delete links</span>
-                  ) : null}
-                  {d.settings.searchEnabled ? (
-                    <span className="app-badge !text-[10px]">Search</span>
                   ) : null}
                   {d.settings.includeThumbnail ? (
                     <span className="app-badge !text-[10px]">Thumb</span>

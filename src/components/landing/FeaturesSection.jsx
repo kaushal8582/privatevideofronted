@@ -1,10 +1,11 @@
-import { BarChart3, Cloud, DollarSign, Link2, MonitorPlay, Upload } from 'lucide-react';
+import { BarChart3, DollarSign, Link2, MonitorPlay, Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SectionShell from './SectionShell.jsx';
 import Reveal from './Reveal.jsx';
 import ShareLinkDemo from './ShareLinkDemo.jsx';
 import DashboardMockup from './DashboardMockup.jsx';
 import PhoneMockup from './PhoneMockup.jsx';
+import { USD_PER_1000_VIEWS } from '../../constants/landing.js';
 
 const FEATURES = [
   {
@@ -37,9 +38,9 @@ const FEATURES = [
   {
     badge: DollarSign,
     title: 'Monetization',
-    body: 'Turn qualified app views into estimated creator earnings. Built for creators who grow an audience over time.',
+    body: `Earn an estimated $${USD_PER_1000_VIEWS} for every 1,000 qualified app views. Clear rate, tracked in Creator Studio as your audience grows.`,
     visual: 'monetization',
-    cta: { label: 'Learn about monetization', hash: '#monetization' },
+    cta: { label: 'See the creator rate', hash: '#monetization' },
   },
 ];
 
@@ -70,11 +71,21 @@ function FeatureVisual({ type }) {
     );
   }
   return (
-    <div className="rounded-2xl border border-[var(--border-green)] bg-[var(--surface-elevated)] p-5 sm:p-6">
-      <Cloud className="w-8 h-8 text-[var(--primary)] mb-3" />
-      <p className="text-sm text-[var(--muted)] leading-relaxed">
-        Estimated earnings update as qualified app views accrue. Availability may vary by region and demand.
-      </p>
+    <div className="relative overflow-hidden rounded-2xl border border-[var(--border-green)] bg-[var(--surface-elevated)] p-5 sm:p-6">
+      <div className="pointer-events-none absolute inset-0 landing-rate-glow opacity-70" aria-hidden />
+      <div className="relative">
+        <p className="text-[10px] uppercase tracking-[0.14em] font-bold text-[var(--primary)] mb-2">
+          Creator rate
+        </p>
+        <p className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-extrabold tracking-tight app-gradient-text leading-none">
+          ${USD_PER_1000_VIEWS}
+        </p>
+        <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">per 1,000 views</p>
+        <p className="mt-3 text-sm text-[var(--muted)] leading-relaxed">
+          Estimated earnings update as qualified app views accrue. Availability may vary by region
+          and demand.
+        </p>
+      </div>
     </div>
   );
 }
