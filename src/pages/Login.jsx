@@ -4,6 +4,12 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext.jsx';
 import { getFriendlyError } from '../services/api.js';
 import GoogleSignInButton from '../components/GoogleSignInButton.jsx';
+import { validateEmail, validatePassword } from '../utils/validation.js';
+
+function FieldError({ message }) {
+  if (!message) return null;
+  return <p className="mt-1.5 text-xs text-[var(--danger)]">{message}</p>;
+}
 
 export default function Login() {
   const { login, loginWithGoogle, isAuthenticated, loading } = useAuth();
@@ -13,15 +19,36 @@ export default function Login() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
   if (!loading && isAuthenticated) {
     return <Navigate to={from} replace />;
   }
 
+  const clearError = (key) => {
+    setErrors((prev) => {
+      if (!prev[key]) return prev;
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (submitting) return;
+
+    const nextErrors = {
+      email: validateEmail(email),
+      password: validatePassword(password),
+    };
+    setErrors(nextErrors);
+    if (nextErrors.email || nextErrors.password) {
+      toast.error('Please fix the highlighted fields.');
+      return;
+    }
+
     setSubmitting(true);
     try {
       await login(email.trim(), password);
@@ -69,31 +96,38 @@ export default function Login() {
 
             <div className="app-divider">or email</div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
               <label className="app-label">
                 Email
                 <input
                   type="email"
-                  required
                   autoComplete="email"
                   inputMode="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="app-input"
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    clearError('email');
+                  }}
+                  className={`app-input ${errors.email ? '!border-[var(--danger)]' : ''}`}
+                  aria-invalid={Boolean(errors.email)}
                 />
+                <FieldError message={errors.email} />
               </label>
 
               <label className="app-label">
                 Password
                 <input
                   type="password"
-                  required
-                  minLength={6}
                   autoComplete="current-password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="app-input"
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    clearError('password');
+                  }}
+                  className={`app-input ${errors.password ? '!border-[var(--danger)]' : ''}`}
+                  aria-invalid={Boolean(errors.password)}
                 />
+                <FieldError message={errors.password} />
               </label>
 
               <button

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import FooterSocialLinks from '../FooterSocialLinks.jsx';
 
 function FooterLink({ to, children }) {
   return (
@@ -24,9 +25,10 @@ export default function LandingFooter() {
                 MastPlayer
               </span>
             </Link>
-            <p className="text-sm text-[var(--muted)] max-w-xs leading-relaxed">
+            <p className="text-sm text-[var(--muted)] max-w-xs leading-relaxed mb-4">
               Upload videos, share a link, and reach viewers on web and Android with Creator Studio.
             </p>
+            <FooterSocialLinks />
           </div>
 
           <div>
@@ -42,14 +44,7 @@ export default function LandingFooter() {
             <p className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)] mb-3 sm:mb-4">Company</p>
             <ul className="space-y-2">
               <li><FooterText>About</FooterText></li>
-              <li>
-                <a
-                  href="mailto:support@mastplayer.in"
-                  className="text-sm text-[var(--muted)] hover:text-[var(--primary)] transition-colors break-all"
-                >
-                  Contact
-                </a>
-              </li>
+              <li><FooterLink to="/contact">Contact</FooterLink></li>
             </ul>
           </div>
 
@@ -68,7 +63,8 @@ export default function LandingFooter() {
 
         <div className="pt-6 sm:pt-8 border-t border-[var(--border)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <p className="text-sm text-[var(--muted)]">© 2026 MastPlayer. All rights reserved.</p>
-          <div className="flex flex-wrap gap-x-4 gap-y-2">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <FooterLink to="/contact">Contact</FooterLink>
             <FooterLink to="/privacy">Privacy Policy</FooterLink>
             <FooterLink to="/dmca">DMCA / Copyright</FooterLink>
             <FooterText>Terms</FooterText>

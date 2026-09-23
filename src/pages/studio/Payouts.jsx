@@ -11,6 +11,12 @@ import {
 import LoadingState from '../../components/LoadingState.jsx';
 import ErrorState from '../../components/ErrorState.jsx';
 import { formatDate, formatUsd } from '../../utils/formatters.js';
+import {
+  validateAccountNumber,
+  validateIfsc,
+  validateName,
+  validateUpiId,
+} from '../../utils/validation.js';
 
 function StatCard({ label, value, hint }) {
   return (
@@ -76,12 +82,36 @@ export default function StudioPayouts() {
   const saveMethods = async (e) => {
     e.preventDefault();
     if (savingMethods) return;
+
+    if (selectedMethod === 'upi') {
+      const nameError = validateName(upiAccountName, { min: 2, max: 80 });
+      const upiError = validateUpiId(upiId);
+      if (nameError || upiError) {
+        toast.error(nameError || upiError);
+        return;
+      }
+    } else {
+      const nameError = validateName(accountName, { min: 2, max: 80 });
+      const accountError = validateAccountNumber(accountNumber);
+      const ifscError = validateIfsc(ifsc);
+      if (nameError || accountError || ifscError) {
+        toast.error(nameError || accountError || ifscError);
+        return;
+      }
+    }
+
     setSavingMethods(true);
     try {
       const payload =
         selectedMethod === 'upi'
-          ? { upiId, upiAccountName }
-          : { bank: { accountName, accountNumber, ifsc } };
+          ? { upiId: upiId.trim(), upiAccountName: upiAccountName.trim() }
+          : {
+              bank: {
+                accountName: accountName.trim(),
+                accountNumber: accountNumber.replace(/\s+/g, ''),
+                ifsc: ifsc.trim().toUpperCase().replace(/\s+/g, ''),
+              },
+            };
       const { data } = await updatePayoutMethods(payload);
       setMethods(data.data.paymentMethods);
       toast.success(selectedMethod === 'upi' ? 'UPI details saved' : 'Bank details saved');
@@ -96,6 +126,15 @@ export default function StudioPayouts() {
     e.preventDefault();
     if (requesting || !wallet) return;
     const amount = Number(amountUsd);
+    const min = Number(wallet.minPayoutUsd ?? wallet.minUsd ?? 5);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      toast.error('Enter a valid payout amount.');
+      return;
+    }
+    if (amount < min) {
+      toast.error(`Minimum payout is $${min.toFixed(2)}.`);
+      return;
+    }
     setRequesting(true);
     try {
       const { data } = await requestPayout({ amountUsd: amount, method: selectedMethod });

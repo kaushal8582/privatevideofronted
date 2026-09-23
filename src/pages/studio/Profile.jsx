@@ -10,6 +10,7 @@ import {
   detectSocialPlatform,
   normalizeSocialUrl,
 } from '../../utils/socialLinks.js';
+import { validateName } from '../../utils/validation.js';
 
 function emptyLink() {
   return { title: '', url: '', platform: 'link', _key: `${Date.now()}-${Math.random()}` };
@@ -76,6 +77,12 @@ export default function StudioProfile() {
   const handleSave = async (e) => {
     e.preventDefault();
     if (saving) return;
+
+    const nameError = validateName(name);
+    if (nameError) {
+      toast.error(nameError);
+      return;
+    }
 
     const cleaned = socialLinks
       .map((l) => ({

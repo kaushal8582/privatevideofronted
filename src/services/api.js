@@ -146,4 +146,6 @@ export const healthCheck = () => {
   return api.get('/health');
 };
 
+export const submitContact = (payload) => api.post('/contact', payload);
+
 export default api;
