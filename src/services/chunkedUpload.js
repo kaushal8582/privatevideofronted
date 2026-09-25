@@ -145,7 +145,6 @@ export async function uploadVideoChunked(file, onProgress, signal, options = {})
     : [];
   const customTitle = String(options.title || '').trim();
   const customThumbnailFile = options.thumbnailFile || null;
-  const category = String(options.category || 'adult').trim() || 'adult';
 
   const { data: initRes } = await api.post(
     '/videos/upload/init',
@@ -153,7 +152,6 @@ export async function uploadVideoChunked(file, onProgress, signal, options = {})
       filename: file.name,
       mimeType: file.type || 'video/mp4',
       size: file.size,
-      category,
       ...(customTitle ? { title: customTitle.slice(0, 120) } : {}),
     },
     { signal }
@@ -208,25 +206,25 @@ export async function uploadVideoChunked(file, onProgress, signal, options = {})
       : await readLocalVideoMeta(file);
     let hasThumbnail = false;
 
-    let thumbBlob = null;
-    if (customThumbnailFile) {
-      thumbBlob = await imageFileToJpegBlob(customThumbnailFile);
-    }
-    if (!thumbBlob && isImage) {
-      thumbBlob = await imageFileToJpegBlob(file);
-    }
-    if (!thumbBlob) {
-      thumbBlob = meta.thumbnailBlob;
-    }
+    // Thumbnails only for videos. Images are stored once (no duplicate preview object).
+    if (!isImage && thumbnailUploadUrl) {
+      let thumbBlob = null;
+      if (customThumbnailFile) {
+        thumbBlob = await imageFileToJpegBlob(customThumbnailFile);
+      }
+      if (!thumbBlob) {
+        thumbBlob = meta.thumbnailBlob;
+      }
 
-    if (thumbBlob && thumbnailUploadUrl) {
-      const thumbRes = await fetch(thumbnailUploadUrl, {
-        method: 'PUT',
-        body: thumbBlob,
-        headers: { 'Content-Type': 'image/jpeg' },
-        signal,
-      });
-      hasThumbnail = thumbRes.ok;
+      if (thumbBlob) {
+        const thumbRes = await fetch(thumbnailUploadUrl, {
+          method: 'PUT',
+          body: thumbBlob,
+          headers: { 'Content-Type': 'image/jpeg' },
+          signal,
+        });
+        hasThumbnail = thumbRes.ok;
+      }
     }
 
     const { data: completeRes } = await api.post(
@@ -236,7 +234,6 @@ export async function uploadVideoChunked(file, onProgress, signal, options = {})
         parts: completed.sort((a, b) => a.partNumber - b.partNumber),
         duration: meta.duration,
         hasThumbnail,
-        category,
         telegramDestinationIds,
       },
       { signal }

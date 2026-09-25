@@ -107,7 +107,6 @@ export function UploadQueueProvider({ children }) {
             telegramDestinationIds: options.telegramDestinationIds || [],
             title: options.title || '',
             thumbnailFile: options.thumbnailFile || null,
-            category: options.category || 'adult',
           }
         );
 
