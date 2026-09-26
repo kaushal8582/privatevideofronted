@@ -17,6 +17,8 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 
+
+
 const nav = [
   { to: '/studio', end: true, label: 'Dashboard', icon: LayoutDashboard },
   { to: '/studio/videos', label: 'Videos', icon: Video },
