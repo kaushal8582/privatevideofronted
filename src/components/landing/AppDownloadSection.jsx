@@ -2,9 +2,11 @@ import { ExternalLink } from 'lucide-react';
 import SectionShell from './SectionShell.jsx';
 import Reveal from './Reveal.jsx';
 import PhoneMockup from './PhoneMockup.jsx';
-import { PLAY_STORE_URL } from '../../constants/landing.js';
+import { PLAY_STORE_URL_OR_DEFAULT } from '../../constants/landing.js';
 
 export default function AppDownloadSection() {
+  const playStoreUrl = PLAY_STORE_URL_OR_DEFAULT;
+
   return (
     <SectionShell id="app" className="py-12 sm:py-16 lg:py-24 bg-[var(--surface)] border-y border-[var(--border)]">
       <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
@@ -18,7 +20,7 @@ export default function AppDownloadSection() {
               from every share URL, and app views that count toward creator stats.
             </p>
             <a
-              href={PLAY_STORE_URL}
+              href={playStoreUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 w-full sm:w-auto rounded-xl app-gradient-bg text-white px-6 py-3.5 text-sm font-bold hover:brightness-110 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"

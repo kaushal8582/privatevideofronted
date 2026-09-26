@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 import { ArrowLeft, Calendar, HardDrive, Play, Sparkles } from 'lucide-react';
 import CopyLinkButton from '../components/CopyLinkButton.jsx';
 import LoadingState from '../components/LoadingState.jsx';
+import WatchAppPromo from '../components/WatchAppPromo.jsx';
+import WatchEarnTeaser from '../components/WatchEarnTeaser.jsx';
 import {
   convertOgEarnLink,
   fetchVideoByShareToken,
@@ -16,9 +18,9 @@ import {
   formatDuration,
   formatFileSize,
 } from '../utils/formatters.js';
+import { PLAY_STORE_URL_OR_DEFAULT } from '../constants/landing.js';
 
-const PLAY_STORE_URL =
-  'https://play.google.com/store/apps/details?id=com.mastplayer.in';
+const PLAY_STORE_URL = PLAY_STORE_URL_OR_DEFAULT;
 
 export default function WatchVideo() {
   const { shareToken } = useParams();
@@ -176,119 +178,132 @@ export default function WatchVideo() {
     : video.thumbnailUrl;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-      <div className="min-w-0">
-        <h1 className="text-2xl sm:text-3xl font-semibold break-words">{video.title}</h1>
-        <p className="text-sm app-muted mt-1 truncate">{video.originalName}</p>
-        {video.ogEarn?.isRemapped ? (
-          <p className="mt-2 text-xs font-semibold text-[var(--blue)]">OG Earn remapped link</p>
-        ) : null}
-      </div>
+    <>
+      <div className="max-w-3xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="min-w-0">
+          <p className="app-kicker uppercase tracking-widest mb-2">Shared video</p>
+          <h1 className="text-2xl sm:text-3xl font-semibold break-words leading-tight">
+            {video.title}
+          </h1>
+          <p className="text-sm app-muted mt-1 truncate">{video.originalName}</p>
+          {video.ogEarn?.isRemapped ? (
+            <p className="mt-2 text-xs font-semibold text-[var(--blue)]">OG Earn remapped link</p>
+          ) : null}
+        </div>
 
-      <div className="relative aspect-video rounded-2xl overflow-hidden border border-[var(--border-green)] bg-[var(--surface)]">
-        {previewUrl ? (
-          <img
-            src={previewUrl}
-            alt=""
-            className={`absolute inset-0 w-full h-full ${isImage ? 'object-contain bg-black' : 'object-cover'}`}
-          />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-[var(--surface)] to-[var(--background)]" />
-        )}
-        {!isImage ? (
-          <>
-            <div className="absolute inset-0 bg-black/35" />
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4 text-center">
+        <div className="relative aspect-video rounded-2xl overflow-hidden border border-[var(--border-green)] bg-[var(--surface)] shadow-[0_0_40px_-12px_var(--glow-cyan)]">
+          {previewUrl ? (
+            <img
+              src={previewUrl}
+              alt=""
+              className={`absolute inset-0 w-full h-full ${isImage ? 'object-contain bg-black' : 'object-cover'}`}
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-[var(--surface)] to-[var(--background)]" />
+          )}
+          {!isImage ? (
+            <>
+              <div className="absolute inset-0 bg-black/40" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4 text-center">
+                <button
+                  type="button"
+                  onClick={openInApp}
+                  disabled={openingApp}
+                  className="inline-flex items-center justify-center gap-2 rounded-full app-btn-primary app-btn-primary-lg !rounded-full shadow-[0_0_32px_var(--glow-cyan)] disabled:opacity-70"
+                >
+                  <Play className="w-5 h-5 fill-white" />
+                  {openingApp ? 'Opening…' : 'View in App'}
+                </button>
+                <p className="text-sm text-white/85 max-w-sm">
+                  Open in Mast Player to watch. If the app isn’t installed, you’ll go to the store.
+                </p>
+              </div>
+              {video.duration != null && (
+                <span className="absolute bottom-3 right-3 rounded-lg bg-black/70 text-white text-xs font-semibold px-2 py-1">
+                  {formatDuration(video.duration)}
+                </span>
+              )}
+            </>
+          ) : null}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={openInApp}
+            disabled={openingApp}
+            className="app-btn-primary disabled:opacity-70"
+          >
+            <Play className="w-4 h-4 fill-white" />
+            {openingApp ? 'Opening…' : 'View in App'}
+          </button>
+          <a href={PLAY_STORE_URL} target="_blank" rel="noreferrer" className="app-btn-secondary">
+            Get Mast Player
+          </a>
+          <CopyLinkButton url={shareUrl} variant="secondary" />
+        </div>
+
+        {showOgEarn && (
+          <div className="app-card-padded space-y-3">
+            <div className="flex items-start gap-3">
+              <span className="app-stat-icon shrink-0">
+                <Sparkles className="w-5 h-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <h2 className="font-semibold">OG Earn</h2>
+                <p className="text-sm app-muted mt-1">
+                  Convert this video into your own share link. You earn{' '}
+                  <strong className="text-[var(--foreground)]">{ownerShare}%</strong> from app
+                  views; original creator gets{' '}
+                  <strong className="text-[var(--foreground)]">{royalty}%</strong>.
+                </p>
+              </div>
+            </div>
+            {myOgUrl ? (
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  readOnly
+                  value={myOgUrl}
+                  className="app-input flex-1 !mt-0 font-mono text-sm"
+                />
+                <CopyLinkButton url={myOgUrl} label="Copy my link" className="shrink-0" />
+                <Link to="/studio/og-earn" className="app-btn-secondary shrink-0">
+                  Open OG Earn
+                </Link>
+              </div>
+            ) : (
               <button
                 type="button"
-                onClick={openInApp}
-                disabled={openingApp}
-                className="inline-flex items-center justify-center gap-2 rounded-full app-btn-primary app-btn-primary-lg !rounded-full shadow-[0_0_32px_var(--glow-cyan)] disabled:opacity-70"
+                onClick={handleOgEarn}
+                disabled={converting}
+                className="app-btn-primary"
               >
-                <Play className="w-5 h-5 fill-white" />
-                {openingApp ? 'Opening…' : 'View in App'}
+                <Sparkles className="w-4 h-4" />
+                {converting
+                  ? 'Creating…'
+                  : isAuthenticated
+                    ? 'Convert to my OG Earn link'
+                    : 'Log in to convert & earn'}
               </button>
-              <p className="text-sm text-white/80 max-w-sm">
-                Open in Mast Player to watch. If the app isn’t installed, you’ll go to the Play Store.
-              </p>
-            </div>
-            {video.duration != null && (
-              <span className="absolute bottom-3 right-3 rounded-lg bg-black/70 text-white text-xs font-semibold px-2 py-1">
-                {formatDuration(video.duration)}
-              </span>
             )}
-          </>
-        ) : null}
-      </div>
-
-      <div className="flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={openInApp}
-          disabled={openingApp}
-          className="app-btn-primary disabled:opacity-70"
-        >
-          <Play className="w-4 h-4 fill-white" />
-          {openingApp ? 'Opening…' : 'View in App'}
-        </button>
-        <a href={PLAY_STORE_URL} target="_blank" rel="noreferrer" className="app-btn-secondary">
-          Get Mast Player
-        </a>
-        <CopyLinkButton url={shareUrl} variant="secondary" />
-      </div>
-
-      {showOgEarn && (
-        <div className="app-card-padded space-y-3">
-          <div className="flex items-start gap-3">
-            <span className="app-stat-icon shrink-0">
-              <Sparkles className="w-5 h-5" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <h2 className="font-semibold">OG Earn</h2>
-              <p className="text-sm app-muted mt-1">
-                Convert this video into your own share link. You earn{' '}
-                <strong className="text-[var(--foreground)]">{ownerShare}%</strong> from app views;
-                original creator gets <strong className="text-[var(--foreground)]">{royalty}%</strong>.
-              </p>
-            </div>
           </div>
-          {myOgUrl ? (
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input readOnly value={myOgUrl} className="app-input flex-1 !mt-0 font-mono text-sm" />
-              <CopyLinkButton url={myOgUrl} label="Copy my link" className="shrink-0" />
-              <Link to="/studio/og-earn" className="app-btn-secondary shrink-0">
-                Open OG Earn
-              </Link>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={handleOgEarn}
-              disabled={converting}
-              className="app-btn-primary"
-            >
-              <Sparkles className="w-4 h-4" />
-              {converting
-                ? 'Creating…'
-                : isAuthenticated
-                  ? 'Convert to my OG Earn link'
-                  : 'Log in to convert & earn'}
-            </button>
-          )}
-        </div>
-      )}
+        )}
 
-      <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm app-muted">
-        <span className="inline-flex items-center gap-1.5">
-          <HardDrive className="w-4 h-4" />
-          {formatFileSize(video.size)}
-        </span>
-        <span>Duration: {formatDuration(video.duration)}</span>
-        <span className="inline-flex items-center gap-1.5">
-          <Calendar className="w-4 h-4" />
-          {formatDate(video.createdAt)}
-        </span>
+        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm app-muted">
+          <span className="inline-flex items-center gap-1.5">
+            <HardDrive className="w-4 h-4" />
+            {formatFileSize(video.size)}
+          </span>
+          <span>Duration: {formatDuration(video.duration)}</span>
+          <span className="inline-flex items-center gap-1.5">
+            <Calendar className="w-4 h-4" />
+            {formatDate(video.createdAt)}
+          </span>
+        </div>
       </div>
-    </div>
+
+      <WatchEarnTeaser />
+      <WatchAppPromo />
+    </>
   );
 }

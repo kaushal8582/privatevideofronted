@@ -3,11 +3,12 @@ import { Analytics } from '@vercel/analytics/react';
 import Navbar from './components/Navbar.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import BackgroundUploadPanel from './components/BackgroundUploadPanel.jsx';
-import FooterSocialLinks from './components/FooterSocialLinks.jsx';
+import LandingFooter from './components/landing/LandingFooter.jsx';
 import StudioLayout from './layouts/StudioLayout.jsx';
 import Landing from './pages/Landing.jsx';
 import WatchVideo from './pages/WatchVideo.jsx';
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx';
+import TermsOfService from './pages/TermsOfService.jsx';
 import DmcaPolicy from './pages/DmcaPolicy.jsx';
 import Contact from './pages/Contact.jsx';
 import Login from './pages/Login.jsx';
@@ -30,25 +31,7 @@ function MarketingShell() {
       <main className="flex-1 w-full min-w-0">
         <Outlet />
       </main>
-      <footer className="border-t border-[var(--border)] py-4 sm:py-6">
-        <div className="app-container px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 text-sm app-muted">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <span>© {new Date().getFullYear()} MastPlayer</span>
-            <FooterSocialLinks />
-          </div>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-            <Link to="/contact" className="app-link text-sm">
-              Contact
-            </Link>
-            <Link to="/privacy" className="app-link text-sm">
-              Privacy Policy
-            </Link>
-            <Link to="/dmca" className="app-link text-sm">
-              DMCA / Copyright
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <LandingFooter />
     </div>
   );
 }
@@ -63,6 +46,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
           <Route path="/dmca" element={<DmcaPolicy />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/v/:shareToken" element={<WatchVideo />} />

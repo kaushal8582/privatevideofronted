@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import LandingNavbar from '../components/landing/LandingNavbar.jsx';
 import LandingFooter from '../components/landing/LandingFooter.jsx';
 import HeroSection from '../components/landing/HeroSection.jsx';
@@ -16,6 +18,17 @@ import AppDownloadSection from '../components/landing/AppDownloadSection.jsx';
 import FinalCTA from '../components/landing/FinalCTA.jsx';
 
 export default function Landing() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const hash = location.hash?.replace(/^#/, '');
+    if (!hash) return;
+    const t = window.setTimeout(() => {
+      document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+    return () => window.clearTimeout(t);
+  }, [location.hash, location.pathname]);
+
   return (
     <div className="landing-page min-h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)] overflow-x-clip">
       <LandingNavbar />

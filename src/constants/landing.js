@@ -1,5 +1,14 @@
-export const PLAY_STORE_URL =
-  'https://play.google.com/store/apps/details?id=com.mastplayer.in';
+export const PLAY_STORE_URL = String(import.meta.env.VITE_PLAY_STORE_URL || '').trim();
+export const APP_STORE_URL = String(import.meta.env.VITE_APP_STORE_URL || '').trim();
+
+/** Watch-page tutorial YouTube URL (watch/share/embed or bare id). Empty = hide tutorial. */
+export const WATCH_TUTORIAL_YOUTUBE_URL = String(
+  import.meta.env.VITE_WATCH_TUTORIAL_YOUTUBE_URL || ''
+).trim();
+
+/** Watch / CTA fallback when env is empty (product still needs a Play link). */
+export const PLAY_STORE_URL_OR_DEFAULT =
+  PLAY_STORE_URL || 'https://play.google.com/store/apps/details?id=com.mastplayer.in';
 
 export const SITE_URL = 'https://mastplayer.in';
 
