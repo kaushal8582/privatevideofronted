@@ -30,6 +30,19 @@ export const formatDate = (dateInput) => {
   });
 };
 
+export const formatDateTime = (dateInput) => {
+  if (!dateInput) return '—';
+  const date = new Date(dateInput);
+  if (Number.isNaN(date.getTime())) return '—';
+  return date.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+};
+
 export const formatUsd = (amount) => {
   const n = Number(amount) || 0;
   return new Intl.NumberFormat('en-US', {

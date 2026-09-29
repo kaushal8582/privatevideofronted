@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Banknote, Info, Wallet } from 'lucide-react';
+import { Banknote, ChevronRight, Info, Wallet } from 'lucide-react';
 import {
   fetchPayoutHistory,
   fetchPayoutWallet,
@@ -10,6 +10,8 @@ import {
 } from '../../services/api.js';
 import LoadingState from '../../components/LoadingState.jsx';
 import ErrorState from '../../components/ErrorState.jsx';
+import PayoutStatusBadge from '../../components/payouts/PayoutStatusBadge.jsx';
+import PayoutDetailModal from '../../components/payouts/PayoutDetailModal.jsx';
 import { formatDate, formatUsd } from '../../utils/formatters.js';
 import {
   validateAccountNumber,
@@ -47,6 +49,8 @@ export default function StudioPayouts() {
 
   const [amountUsd, setAmountUsd] = useState('');
   const [requesting, setRequesting] = useState(false);
+  const [detailId, setDetailId] = useState(null);
+  const closeDetail = useCallback(() => setDetailId(null), []);
 
   const load = async () => {
     setLoading(true);
@@ -135,6 +139,10 @@ export default function StudioPayouts() {
       toast.error(`Minimum payout is $${min.toFixed(2)}.`);
       return;
     }
+    if (amount > Number(wallet.availableUsd) + 1e-9) {
+      toast.error(`Available balance is only ${formatUsd(wallet.availableUsd)}.`);
+      return;
+    }
     setRequesting(true);
     try {
       const { data } = await requestPayout({ amountUsd: amount, method: selectedMethod });
@@ -161,8 +169,8 @@ export default function StudioPayouts() {
   const min = wallet?.minPayoutUsd ?? 5;
   const methodReady =
     selectedMethod === 'upi' ? Boolean(methods?.hasUpi) : Boolean(methods?.hasBank);
-  const canRequest =
-    wallet.availableUsd >= min && wallet.pendingCount === 0 && methodReady;
+  const maxWithdrawable = Math.floor(Number(wallet.availableUsd || 0) * 100) / 100;
+  const canRequest = maxWithdrawable >= min && methodReady;
 
   return (
     <div className="space-y-8">
@@ -178,8 +186,9 @@ export default function StudioPayouts() {
       <div className="app-success-banner flex gap-3 items-start">
         <Info className="w-5 h-5 text-[var(--blue)] shrink-0 mt-0.5" />
         <p className="text-sm app-muted leading-relaxed">
-          Available = total earned − pending requests − lifetime paid. Only one pending request at a
-          time. After we send payment outside the app, an admin marks it paid.
+          Available = total earned − open requests − lifetime paid. You can split your balance into
+          several requests (minimum {formatUsd(min)} each). After we send payment outside the app, an
+          admin marks it paid. Click any request below to see its full activity.
         </p>
       </div>
 
@@ -188,7 +197,11 @@ export default function StudioPayouts() {
         <StatCard
           label="Pending"
           value={formatUsd(wallet.pendingUsd)}
-          hint={wallet.pendingCount ? `${wallet.pendingCount} open request` : 'No open requests'}
+          hint={
+            wallet.pendingCount
+              ? `${wallet.pendingCount} open request${wallet.pendingCount === 1 ? '' : 's'}`
+              : 'No open requests'
+          }
         />
         <StatCard label="Lifetime paid" value={formatUsd(wallet.lifetimePaidUsd)} />
         <StatCard
@@ -349,24 +362,45 @@ export default function StudioPayouts() {
             <label className="app-label" htmlFor="amountUsd">
               Amount (USD)
             </label>
-            <input
-              id="amountUsd"
-              className="app-input"
-              type="number"
-              min={min}
-              step="0.01"
-              value={amountUsd}
-              onChange={(e) => setAmountUsd(e.target.value)}
-              placeholder={`Min $${min.toFixed(2)}`}
-            />
+            <div className="flex gap-2">
+              <input
+                id="amountUsd"
+                className="app-input flex-1"
+                type="number"
+                min={min}
+                max={maxWithdrawable || undefined}
+                step="0.01"
+                value={amountUsd}
+                onChange={(e) => setAmountUsd(e.target.value)}
+                placeholder={`Min $${min.toFixed(2)}`}
+              />
+              <button
+                type="button"
+                className="app-btn-secondary shrink-0"
+                disabled={maxWithdrawable < min}
+                onClick={() => setAmountUsd(maxWithdrawable.toFixed(2))}
+              >
+                Max
+              </button>
+            </div>
             <p className="mt-1.5 text-xs app-muted">
-              Available {formatUsd(wallet.availableUsd)} · minimum {formatUsd(min)}
+              Available {formatUsd(wallet.availableUsd)} · minimum {formatUsd(min)} per request
             </p>
           </div>
 
           {wallet.pendingCount > 0 ? (
-            <p className="text-sm text-[var(--warning,var(--primary))]">
-              You already have a pending request. Wait until it is paid or rejected.
+            <p className="text-sm app-muted">
+              {formatUsd(wallet.pendingUsd)} is on hold in {wallet.pendingCount} open request
+              {wallet.pendingCount === 1 ? '' : 's'}.{' '}
+              {maxWithdrawable >= min
+                ? 'You can still request the remaining balance.'
+                : null}
+            </p>
+          ) : null}
+          {maxWithdrawable > 0 && maxWithdrawable < min ? (
+            <p className="text-sm app-muted">
+              Remaining balance is below the {formatUsd(min)} minimum. It will be available once
+              you earn more.
             </p>
           ) : null}
 
@@ -391,29 +425,37 @@ export default function StudioPayouts() {
                   <th>Amount</th>
                   <th>Method</th>
                   <th>Status</th>
-                  <th className="px-5">Note</th>
+                  <th>Note</th>
+                  <th className="px-5 w-10" aria-label="Details" />
                 </tr>
               </thead>
               <tbody>
                 {history.map((row) => (
-                  <tr key={row.id}>
+                  <tr
+                    key={row.id}
+                    role="button"
+                    tabIndex={0}
+                    className="cursor-pointer hover:bg-[var(--surface)] focus:outline-none focus-visible:bg-[var(--surface)]"
+                    onClick={() => setDetailId(row.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setDetailId(row.id);
+                      }
+                    }}
+                  >
                     <td className="px-5 app-muted">{formatDate(row.createdAt)}</td>
                     <td className="tabular-nums font-medium">{formatUsd(row.amountUsd)}</td>
                     <td className="uppercase text-xs font-semibold">{row.method}</td>
                     <td>
-                      <span
-                        className={
-                          row.status === 'paid'
-                            ? 'text-[var(--blue)]'
-                            : row.status === 'rejected'
-                              ? 'text-[var(--danger,#ef4444)]'
-                              : ''
-                        }
-                      >
-                        {row.status}
-                      </span>
+                      <PayoutStatusBadge status={row.status} />
                     </td>
-                    <td className="px-5 text-sm app-muted">{row.adminNote || '—'}</td>
+                    <td className="text-sm app-muted max-w-[220px] truncate">
+                      {(row.status === 'rejected' && row.rejectionReason) || row.adminNote || '—'}
+                    </td>
+                    <td className="px-5 app-muted">
+                      <ChevronRight className="w-4 h-4" />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -421,6 +463,8 @@ export default function StudioPayouts() {
           </div>
         )}
       </div>
+
+      <PayoutDetailModal payoutId={detailId} onClose={closeDetail} />
     </div>
   );
 }

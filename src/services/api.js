@@ -132,6 +132,8 @@ export const requestPayout = (payload) => api.post('/payouts/request', payload);
 export const fetchPayoutHistory = (page = 1, limit = 20) =>
   api.get('/payouts/history', { params: { page, limit } });
 
+export const fetchPayoutDetail = (id) => api.get(`/payouts/history/${id}`);
+
 /** @deprecated Prefer uploadVideoChunked for production (avoids 413). */
 export const uploadVideo = (file, onUploadProgress, signal) => {
   const formData = new FormData();
