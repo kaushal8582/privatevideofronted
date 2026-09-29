@@ -83,10 +83,10 @@ export default function PayoutDetailModal({ payoutId, onClose }) {
 
   if (!payoutId) return null;
 
-  const copyTxn = async () => {
+  const copyValue = async (value, label) => {
     try {
-      await navigator.clipboard.writeText(request.transactionId);
-      toast.success('Transaction ID copied');
+      await navigator.clipboard.writeText(value);
+      toast.success(`${label} copied`);
     } catch {
       toast.error('Could not copy');
     }
@@ -134,6 +134,23 @@ export default function PayoutDetailModal({ payoutId, onClose }) {
         ) : request ? (
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
+              {request.reference ? (
+                <div className="col-span-2">
+                  <DetailRow label="Payment ID">
+                    <span className="inline-flex items-center gap-2 font-mono">
+                      {request.reference}
+                      <button
+                        type="button"
+                        onClick={() => copyValue(request.reference, 'Payment ID')}
+                        className="p-1 rounded app-muted hover:text-[var(--foreground)]"
+                        aria-label="Copy payment ID"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                      </button>
+                    </span>
+                  </DetailRow>
+                </div>
+              ) : null}
               <DetailRow label="Requested on">{formatDateTime(request.createdAt)}</DetailRow>
               <DetailRow label="Method">
                 <span className="uppercase">{request.method}</span>
@@ -148,7 +165,7 @@ export default function PayoutDetailModal({ payoutId, onClose }) {
                       {request.transactionId}
                       <button
                         type="button"
-                        onClick={copyTxn}
+                        onClick={() => copyValue(request.transactionId, 'Transaction ID')}
                         className="p-1 rounded app-muted hover:text-[var(--foreground)]"
                         aria-label="Copy transaction ID"
                       >

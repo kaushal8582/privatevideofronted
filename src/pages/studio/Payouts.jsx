@@ -148,7 +148,8 @@ export default function StudioPayouts() {
       const { data } = await requestPayout({ amountUsd: amount, method: selectedMethod });
       setWallet(data.data.wallet);
       setAmountUsd('');
-      toast.success('Payout request submitted');
+      const ref = data.data.request?.reference;
+      toast.success(ref ? `Payout request submitted · ${ref}` : 'Payout request submitted');
       const hist = await fetchPayoutHistory(1, 20);
       setHistory(hist.data.data.items || []);
     } catch (err) {
@@ -418,10 +419,11 @@ export default function StudioPayouts() {
           </div>
         ) : (
           <div className="app-table-wrap overflow-x-auto">
-            <table className="app-table min-w-[640px]">
+            <table className="app-table min-w-[760px]">
               <thead>
                 <tr>
-                  <th className="px-5">Date</th>
+                  <th className="px-5">Payment ID</th>
+                  <th>Date</th>
                   <th>Amount</th>
                   <th>Method</th>
                   <th>Status</th>
@@ -444,7 +446,10 @@ export default function StudioPayouts() {
                       }
                     }}
                   >
-                    <td className="px-5 app-muted">{formatDate(row.createdAt)}</td>
+                    <td className="px-5 font-mono text-xs font-semibold whitespace-nowrap">
+                      {row.reference || '—'}
+                    </td>
+                    <td className="app-muted whitespace-nowrap">{formatDate(row.createdAt)}</td>
                     <td className="tabular-nums font-medium">{formatUsd(row.amountUsd)}</td>
                     <td className="uppercase text-xs font-semibold">{row.method}</td>
                     <td>
