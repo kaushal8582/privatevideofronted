@@ -5,6 +5,7 @@ import {
   login as apiLogin,
   loginWithGoogle as apiGoogle,
   register as apiRegister,
+  verifyEmail as apiVerifyEmail,
   setStoredToken,
   updateMe,
 } from '../services/api.js';
@@ -51,6 +52,7 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (email, password) => {
     const { data } = await apiLogin({ email, password });
+    if (data.data?.requiresEmailVerification) return data.data;
     setStoredToken(data.data.token);
     setUser(data.data.user);
     return data.data.user;
@@ -63,6 +65,14 @@ export function AuthProvider({ children }) {
       password,
       ...(referralCode ? { referralCode } : {}),
     });
+    if (data.data?.requiresEmailVerification) return data.data;
+    setStoredToken(data.data.token);
+    setUser(data.data.user);
+    return data.data.user;
+  }, []);
+
+  const completeEmailVerification = useCallback(async (verificationToken, code) => {
+    const { data } = await apiVerifyEmail(verificationToken, code);
     setStoredToken(data.data.token);
     setUser(data.data.user);
     return data.data.user;
@@ -88,12 +98,13 @@ export function AuthProvider({ children }) {
       isAuthenticated: Boolean(user),
       login,
       register,
+      completeEmailVerification,
       loginWithGoogle,
       updateProfile,
       logout,
       refresh: bootstrap,
     }),
-    [user, loading, login, register, loginWithGoogle, updateProfile, logout, bootstrap]
+    [user, loading, login, register, completeEmailVerification, loginWithGoogle, updateProfile, logout, bootstrap]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

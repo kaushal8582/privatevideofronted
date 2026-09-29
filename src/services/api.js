@@ -52,9 +52,24 @@ export const getFriendlyError = (error, fallback = 'Something went wrong.') => {
   return data?.message || error?.message || fallback;
 };
 
+/** Machine-readable API error code (e.g. OTP_EXPIRED) — never parse messages. */
+export const getApiErrorCode = (error) => error?.response?.data?.error || null;
+
+export const getApiErrorData = (error) => error?.response?.data?.data || null;
+
 export const register = (payload) => api.post('/auth/register', payload);
 
 export const login = (payload) => api.post('/auth/login', payload);
+
+export const verifyEmail = (verificationToken, code) =>
+  api.post('/auth/verify-email', { verificationToken, code });
+export const resendVerification = (verificationToken) =>
+  api.post('/auth/resend-verification', { verificationToken });
+export const forgotPassword = (email) => api.post('/auth/forgot-password', { email });
+export const verifyPasswordReset = (email, code) =>
+  api.post('/auth/verify-password-reset', { email, code });
+export const resetPassword = (resetToken, password) =>
+  api.post('/auth/reset-password', { resetToken, password });
 
 export const loginWithGoogle = (idToken, referralCode) =>
   api.post('/auth/google', {
@@ -97,6 +112,9 @@ export const fetchTelegramPublications = (videoId) =>
 
 export const retryTelegramPublication = (id) =>
   api.post(`/telegram/publications/${id}/retry`);
+
+export const reshareVideoToTelegram = (videoId, destinationIds) =>
+  api.post(`/telegram/videos/${videoId}/reshare`, { destinationIds });
 
 /** MP2MP Link Converter Bot */
 export const fetchMp2mpStatus = () => api.get('/telegram/mp2mp/status');

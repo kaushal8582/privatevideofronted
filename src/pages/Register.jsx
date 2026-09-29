@@ -2,8 +2,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext.jsx';
-import { getFriendlyError } from '../services/api.js';
+import { getApiErrorCode, getApiErrorData, getFriendlyError } from '../services/api.js';
 import GoogleSignInButton from '../components/GoogleSignInButton.jsx';
+import PasswordInput from '../components/PasswordInput.jsx';
+import { saveVerificationSession } from '../utils/verificationSession.js';
 import {
   validateEmail,
   validateName,
@@ -25,8 +27,11 @@ export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  /** Set when the email is already registered: { verify: boolean } */
+  const [existingAccount, setExistingAccount] = useState(null);
 
   const referralCode = useMemo(() => {
     const fromUrl = searchParams.get('ref')?.trim();
@@ -64,25 +69,46 @@ export default function Register() {
       name: validateName(name),
       email: validateEmail(email),
       password: validatePassword(password),
+      confirmPassword: password === confirmPassword ? '' : 'Passwords do not match.',
     };
     setErrors(nextErrors);
-    if (nextErrors.name || nextErrors.email || nextErrors.password) {
+    if (nextErrors.name || nextErrors.email || nextErrors.password || nextErrors.confirmPassword) {
       toast.error('Please fix the highlighted fields.');
       return;
     }
 
     setSubmitting(true);
+    setExistingAccount(null);
     try {
-      await register({
+      const result = await register({
         name: name.trim(),
         email: email.trim(),
         password,
         referralCode: referralCode || undefined,
       });
       clearReferralStorage();
-      toast.success('Account created!');
-      navigate('/studio', { replace: true });
+      if (result?.requiresEmailVerification) {
+        saveVerificationSession(result);
+        toast.success('Check your email for the verification code.');
+        navigate('/verify-email', { replace: true });
+      } else {
+        toast.success('Account created!');
+        navigate('/studio', { replace: true });
+      }
     } catch (err) {
+      const errCode = getApiErrorCode(err);
+      const pending = getApiErrorData(err);
+      if (pending?.requiresEmailVerification) {
+        clearReferralStorage();
+        saveVerificationSession(pending);
+        toast.error(getFriendlyError(err));
+        navigate('/verify-email', { replace: true });
+        return;
+      }
+      if (errCode === 'EMAIL_VERIFICATION_REQUIRED' || errCode === 'EMAIL_IN_USE') {
+        setExistingAccount({ verify: errCode === 'EMAIL_VERIFICATION_REQUIRED' });
+        return;
+      }
       toast.error(getFriendlyError(err, 'Could not create account.'));
     } finally {
       setSubmitting(false);
@@ -130,6 +156,24 @@ export default function Register() {
 
             <div className="app-divider">or email</div>
 
+            {existingAccount ? (
+              <div className="app-success-banner text-sm" role="status">
+                <p className="font-semibold text-[var(--foreground)]">Account already exists.</p>
+                <p className="mt-1 app-muted">
+                  {existingAccount.verify
+                    ? 'Please sign in to verify your email.'
+                    : 'Please sign in with this email instead.'}
+                </p>
+                <Link
+                  to="/login"
+                  state={{ email: email.trim() }}
+                  className="app-btn-primary mt-3 w-full"
+                >
+                  Sign In
+                </Link>
+              </div>
+            ) : null}
+
             <form onSubmit={handleSubmit} className="space-y-4" noValidate>
               <label className="app-label">
                 Name
@@ -157,6 +201,7 @@ export default function Register() {
                   onChange={(e) => {
                     setEmail(e.target.value);
                     clearError('email');
+                    setExistingAccount(null);
                   }}
                   className={`app-input ${errors.email ? '!border-[var(--danger)]' : ''}`}
                   aria-invalid={Boolean(errors.email)}
@@ -166,19 +211,33 @@ export default function Register() {
 
               <label className="app-label">
                 Password
-                <input
-                  type="password"
+                <PasswordInput
                   autoComplete="new-password"
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
                     clearError('password');
                   }}
-                  className={`app-input ${errors.password ? '!border-[var(--danger)]' : ''}`}
+                  className={errors.password ? '!border-[var(--danger)]' : ''}
                   aria-invalid={Boolean(errors.password)}
                 />
                 <span className="mt-1 block text-xs app-muted">At least 6 characters</span>
                 <FieldError message={errors.password} />
+              </label>
+
+              <label className="app-label">
+                Confirm password
+                <PasswordInput
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    clearError('confirmPassword');
+                  }}
+                  className={errors.confirmPassword ? '!border-[var(--danger)]' : ''}
+                  aria-invalid={Boolean(errors.confirmPassword)}
+                />
+                <FieldError message={errors.confirmPassword} />
               </label>
 
               <button

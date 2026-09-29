@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Eye,
@@ -6,10 +6,12 @@ import {
   Video,
   Upload,
   ArrowRight,
-  Copy,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { fetchDashboardStats, getFriendlyError } from '../../services/api.js';
+import { deleteVideo, fetchDashboardStats, getFriendlyError } from '../../services/api.js';
+import DeleteVideoModal from '../../components/DeleteVideoModal.jsx';
+import TelegramReshareModal from '../../components/TelegramReshareModal.jsx';
+import VideoActionsMenu from '../../components/VideoActionsMenu.jsx';
 import { formatCount, formatDate, formatDuration, formatUsd } from '../../utils/formatters.js';
 
 function StatCard({ icon: Icon, label, value, hint, accent = 'green' }) {
@@ -42,25 +44,45 @@ export default function StudioOverview() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [reshareVideo, setReshareVideo] = useState(null);
+
+  const loadStats = useCallback(async ({ silent = false, isCancelled = () => false } = {}) => {
+    if (!silent) setLoading(true);
+    setError(null);
+    try {
+      const { data } = await fetchDashboardStats();
+      if (!isCancelled()) setStats(data.data);
+    } catch (err) {
+      if (!isCancelled()) setError(getFriendlyError(err, 'Could not load dashboard.'));
+    } finally {
+      if (!isCancelled() && !silent) setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const { data } = await fetchDashboardStats();
-        if (!cancelled) setStats(data.data);
-      } catch (err) {
-        if (!cancelled) setError(getFriendlyError(err, 'Could not load dashboard.'));
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
+    loadStats({ isCancelled: () => cancelled });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [loadStats]);
+
+  const handleConfirmDelete = async () => {
+    if (!pendingDelete || deleting) return;
+    setDeleting(true);
+    try {
+      await deleteVideo(pendingDelete.id);
+      toast.success('Video deleted');
+      setPendingDelete(null);
+      await loadStats({ silent: true });
+    } catch (err) {
+      toast.error(getFriendlyError(err, 'Failed to delete video.'));
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const copyLink = async (url) => {
     try {
@@ -141,22 +163,16 @@ export default function StudioOverview() {
                 <table className="app-table">
                   <thead>
                     <tr>
-                      <th className="px-5 sm:px-6">Link</th>
-                      <th>Video</th>
+                      <th className="px-5 sm:px-6">Video</th>
                       <th>Views</th>
-                      <th className="hidden sm:table-cell px-5 sm:px-6">Uploaded</th>
+                      <th className="hidden sm:table-cell">Uploaded</th>
+                      <th className="px-5 sm:px-6 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {stats.recentVideos.map((v) => (
                       <tr key={v.id}>
                         <td className="px-5 sm:px-6">
-                          <button type="button" onClick={() => copyLink(v.shareUrl)} className="app-btn-secondary !py-1.5 !px-2.5 !text-xs">
-                            <Copy className="w-3.5 h-3.5" />
-                            Copy
-                          </button>
-                        </td>
-                        <td>
                           <div className="flex items-center gap-3 min-w-0">
                             <div className="w-14 h-9 rounded-lg overflow-hidden bg-[var(--surface)] border border-[var(--border)] shrink-0">
                               {v.thumbnailUrl ? (
@@ -172,7 +188,18 @@ export default function StudioOverview() {
                         <td className="tabular-nums font-medium">
                           {formatCount(v.payableViewCount ?? v.viewCount)}
                         </td>
-                        <td className="app-muted hidden sm:table-cell px-5 sm:px-6">{formatDate(v.createdAt)}</td>
+                        <td className="app-muted hidden sm:table-cell">{formatDate(v.createdAt)}</td>
+                        <td className="px-5 sm:px-6">
+                          <div className="flex items-center justify-end">
+                            <VideoActionsMenu
+                              video={v}
+                              disabled={deleting && pendingDelete?.id === v.id}
+                              onCopy={() => copyLink(v.shareUrl)}
+                              onReshare={() => setReshareVideo(v)}
+                              onDelete={() => setPendingDelete(v)}
+                            />
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -182,6 +209,16 @@ export default function StudioOverview() {
           </section>
         </>
       )}
+
+      <DeleteVideoModal
+        open={Boolean(pendingDelete)}
+        title={pendingDelete?.title}
+        loading={deleting}
+        onCancel={() => !deleting && setPendingDelete(null)}
+        onConfirm={handleConfirmDelete}
+      />
+
+      <TelegramReshareModal video={reshareVideo} onClose={() => setReshareVideo(null)} />
     </div>
   );
 }

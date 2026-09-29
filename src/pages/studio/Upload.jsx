@@ -81,27 +81,47 @@ export default function StudioUpload() {
     return () => URL.revokeObjectURL(url);
   }, [thumbnailFile]);
 
+  const queuedTelegram = job.result?.telegramPublish?.queued ?? 0;
+
+  // Every poll counts against the API's per-IP global rate limit, so stop as soon as
+  // all publications settle (or after POLL_MAX_MS) and skip ticks while the tab is hidden.
   useEffect(() => {
-    if (job.status !== 'success' || !job.result?.id) {
+    if (job.status !== 'success' || !job.result?.id || queuedTelegram === 0) {
       setPublications([]);
       return undefined;
     }
+    const POLL_INTERVAL_MS = 3000;
+    const POLL_MAX_MS = 2 * 60 * 1000;
+    const startedAt = Date.now();
     let cancelled = false;
+    let timer = null;
+
     const load = async () => {
-      try {
-        const { data } = await fetchTelegramPublications(job.result.id);
-        if (!cancelled) setPublications(data.data || []);
-      } catch {
-        /* ignore */
+      if (cancelled) return;
+      let settled = false;
+      if (document.visibilityState !== 'hidden') {
+        try {
+          const { data } = await fetchTelegramPublications(job.result.id);
+          if (cancelled) return;
+          const list = data.data || [];
+          setPublications(list);
+          settled =
+            list.length > 0 &&
+            list.every((p) => p.status === 'published' || p.status === 'failed');
+        } catch {
+          /* ignore */
+        }
+      }
+      if (!cancelled && !settled && Date.now() - startedAt < POLL_MAX_MS) {
+        timer = setTimeout(load, POLL_INTERVAL_MS);
       }
     };
     load();
-    const id = setInterval(load, 2500);
     return () => {
       cancelled = true;
-      clearInterval(id);
+      clearTimeout(timer);
     };
-  }, [job.status, job.result?.id]);
+  }, [job.status, job.result?.id, queuedTelegram]);
 
   const handleRetryTelegram = async (publicationId) => {
     if (!publicationId || retryingId) return;

@@ -2,8 +2,10 @@ import { useCallback, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext.jsx';
-import { getFriendlyError } from '../services/api.js';
+import { getApiErrorData, getFriendlyError } from '../services/api.js';
 import GoogleSignInButton from '../components/GoogleSignInButton.jsx';
+import PasswordInput from '../components/PasswordInput.jsx';
+import { saveVerificationSession } from '../utils/verificationSession.js';
 import { validateEmail, validatePassword } from '../utils/validation.js';
 
 function FieldError({ message }) {
@@ -17,7 +19,7 @@ export default function Login() {
   const location = useLocation();
   const from = location.state?.from || '/studio';
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(() => location.state?.email || '');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -51,10 +53,23 @@ export default function Login() {
 
     setSubmitting(true);
     try {
-      await login(email.trim(), password);
-      toast.success('Welcome back!');
-      navigate(from, { replace: true });
+      const result = await login(email.trim(), password);
+      if (result?.requiresEmailVerification) {
+        saveVerificationSession(result);
+        toast.success('Please verify your email to continue.');
+        navigate('/verify-email', { replace: true });
+      } else {
+        toast.success('Welcome back!');
+        navigate(from, { replace: true });
+      }
     } catch (err) {
+      const pending = getApiErrorData(err);
+      if (pending?.requiresEmailVerification) {
+        saveVerificationSession(pending);
+        toast.error(getFriendlyError(err));
+        navigate('/verify-email', { replace: true });
+        return;
+      }
       toast.error(getFriendlyError(err, 'Login failed.'));
     } finally {
       setSubmitting(false);
@@ -115,16 +130,20 @@ export default function Login() {
               </label>
 
               <label className="app-label">
-                Password
-                <input
-                  type="password"
+                <span className="flex items-center justify-between gap-3">
+                  Password
+                  <Link to="/forgot-password" className="app-link text-xs sm:text-sm">
+                    Forgot password?
+                  </Link>
+                </span>
+                <PasswordInput
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
                     clearError('password');
                   }}
-                  className={`app-input ${errors.password ? '!border-[var(--danger)]' : ''}`}
+                  className={errors.password ? '!border-[var(--danger)]' : ''}
                   aria-invalid={Boolean(errors.password)}
                 />
                 <FieldError message={errors.password} />

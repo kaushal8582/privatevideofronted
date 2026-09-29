@@ -13,6 +13,8 @@ import DmcaPolicy from './pages/DmcaPolicy.jsx';
 import Contact from './pages/Contact.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
+import VerifyEmail from './pages/VerifyEmail.jsx';
+import ForgotPassword from './pages/ForgotPassword.jsx';
 import NotFound from './pages/NotFound.jsx';
 import StudioOverview from './pages/studio/Overview.jsx';
 import StudioVideos from './pages/studio/Videos.jsx';
@@ -45,6 +47,8 @@ export default function App() {
         <Route element={<MarketingShell />}>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/dmca" element={<DmcaPolicy />} />

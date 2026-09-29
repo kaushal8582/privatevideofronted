@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Upload, Link2, Smartphone } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
-import DashboardMockup from './DashboardMockup.jsx';
-import PhoneMockup from './PhoneMockup.jsx';
+import HeroVideo from './HeroVideo.jsx';
 import Reveal from './Reveal.jsx';
 
 const TRUST = [
@@ -78,21 +77,7 @@ export default function HeroSection() {
           </div>
 
           <Reveal delay={120} className="relative min-w-0 w-full">
-            <div className="relative w-full max-w-full">
-              <div className="w-full overflow-hidden rounded-2xl">
-                <DashboardMockup />
-              </div>
-              {/* Phone overlay — tablet+ only, clipped so it never causes page scroll */}
-              <div className="hidden md:block absolute -bottom-4 -right-2 lg:-bottom-6 lg:-right-4 xl:-right-6 w-[38%] max-w-[180px] lg:max-w-[200px] z-10">
-                <PhoneMockup />
-              </div>
-              {/* Phone below mockup on small screens */}
-              <div className="md:hidden mt-6 flex justify-center">
-                <div className="w-[min(100%,220px)]">
-                  <PhoneMockup />
-                </div>
-              </div>
-            </div>
+            <HeroVideo />
           </Reveal>
         </div>
       </div>

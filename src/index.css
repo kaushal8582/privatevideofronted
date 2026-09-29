@@ -1,8 +1,56 @@
 @import "tailwindcss";
 
+/* Inter Display — self-hosted (not on Google Fonts). Files: public/fonts/inter-display/ */
+@font-face {
+  font-family: "Inter Display";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/inter-display/InterDisplay-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter Display";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/inter-display/InterDisplay-Medium.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter Display";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/inter-display/InterDisplay-SemiBold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter Display";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/inter-display/InterDisplay-Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter Display";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("/fonts/inter-display/InterDisplay-ExtraBold.woff2") format("woff2");
+}
+
 @theme {
   --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-display: "Syne", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-display: "Inter Display", "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+  }
 }
 
 /* Logo gradient — shared across themes */

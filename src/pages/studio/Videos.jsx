@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Upload, Trash2, Copy, ExternalLink, Eye } from 'lucide-react';
+import { Upload, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
 import useVideos from '../../hooks/useVideos.js';
 import EmptyState from '../../components/EmptyState.jsx';
 import { SkeletonGrid } from '../../components/LoadingState.jsx';
 import ErrorState from '../../components/ErrorState.jsx';
 import DeleteVideoModal from '../../components/DeleteVideoModal.jsx';
+import TelegramReshareModal from '../../components/TelegramReshareModal.jsx';
+import VideoActionsMenu from '../../components/VideoActionsMenu.jsx';
 import VideoThumbnail from '../../components/VideoThumbnail.jsx';
 import {
   formatCount,
@@ -20,6 +22,7 @@ export default function StudioVideos() {
     useVideos({ page: 1, limit: 60 });
 
   const [pendingDelete, setPendingDelete] = useState(null);
+  const [reshareVideo, setReshareVideo] = useState(null);
 
   const handleConfirmDelete = async () => {
     if (!pendingDelete) return;
@@ -71,11 +74,10 @@ export default function StudioVideos() {
       {!loading && !error && videos.length > 0 && (
         <div className="app-table-wrap min-w-0 max-w-full">
           <div className="overflow-x-auto overscroll-x-contain">
-            <table className="app-table min-w-[720px]">
+            <table className="app-table min-w-[640px]">
               <thead>
                 <tr>
-                  <th className="px-5">Link</th>
-                  <th>Video</th>
+                  <th className="px-5">Video</th>
                   <th>
                     <span className="inline-flex items-center gap-1">
                       <Eye className="w-3.5 h-3.5" /> Views
@@ -93,18 +95,6 @@ export default function StudioVideos() {
                   return (
                     <tr key={id}>
                       <td className="px-5">
-                        <div className="flex items-center gap-1.5">
-                          <button type="button" onClick={() => copyLink(video.shareUrl)} className="app-btn-secondary !py-1.5 !px-2.5 !text-xs">
-                            <Copy className="w-3.5 h-3.5" />
-                            Copy
-                          </button>
-                          <Link to={`/v/${video.shareToken}`} className="app-btn-secondary !py-1.5 !px-2.5 !text-xs">
-                            <ExternalLink className="w-3.5 h-3.5" />
-                            Open
-                          </Link>
-                        </div>
-                      </td>
-                      <td>
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="w-20 h-12 rounded-lg overflow-hidden bg-[var(--surface)] border border-[var(--border)] shrink-0 relative">
                             <VideoThumbnail
@@ -129,16 +119,14 @@ export default function StudioVideos() {
                       <td className="app-muted">{formatFileSize(video.size)}</td>
                       <td className="app-muted">{formatDate(video.createdAt)}</td>
                       <td className="px-5">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <button
-                            type="button"
+                        <div className="flex items-center justify-end">
+                          <VideoActionsMenu
+                            video={video}
                             disabled={deleting}
-                            onClick={() => setPendingDelete(video)}
-                            className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-[var(--danger)] hover:bg-[var(--danger-soft)] disabled:opacity-50"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                            Delete
-                          </button>
+                            onCopy={() => copyLink(video.shareUrl)}
+                            onReshare={() => setReshareVideo(video)}
+                            onDelete={() => setPendingDelete(video)}
+                          />
                         </div>
                       </td>
                     </tr>
@@ -157,6 +145,8 @@ export default function StudioVideos() {
         onCancel={() => !deletingId && setPendingDelete(null)}
         onConfirm={handleConfirmDelete}
       />
+
+      <TelegramReshareModal video={reshareVideo} onClose={() => setReshareVideo(null)} />
     </div>
   );
 }
