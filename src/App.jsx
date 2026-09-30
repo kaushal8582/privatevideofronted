@@ -5,7 +5,8 @@ import Navbar from './components/Navbar.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import BackgroundUploadPanel from './components/BackgroundUploadPanel.jsx';
 import LoadingState from './components/LoadingState.jsx';
-import DevToolsNotice from './components/DevToolsNotice.jsx';
+import DeveloperToolsNotice from './components/DeveloperToolsNotice.jsx';
+import useDeveloperToolsWarning from './hooks/useDeveloperToolsWarning.js';
 import LandingFooter from './components/landing/LandingFooter.jsx';
 import StudioLayout from './layouts/StudioLayout.jsx';
 import Landing from './pages/Landing.jsx';
@@ -47,6 +48,8 @@ function MarketingShell() {
 }
 
 export default function App() {
+  const { devToolsWarningVisible, dismiss } = useDeveloperToolsWarning();
+
   return (
     <>
       <Routes>
@@ -90,7 +93,7 @@ export default function App() {
       <BackgroundUploadPanel />
       <PwaUpdatePrompt />
       <OfflineScreen />
-      {import.meta.env.PROD && <DevToolsNotice />}
+      <DeveloperToolsNotice open={devToolsWarningVisible} onReturn={dismiss} />
       <Analytics />
     </>
   );

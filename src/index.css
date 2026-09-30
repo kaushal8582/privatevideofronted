@@ -660,6 +660,59 @@ body {
   }
 }
 
+/* Developer tools notice (production deterrent UX) — fixed security palette, independent of theme */
+.devtools-notice {
+  background: #030504;
+  color: #ffffff;
+}
+
+.devtools-notice-glow {
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(0, 245, 122, 0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 100%, rgba(58, 123, 213, 0.1) 0%, transparent 60%);
+}
+
+.devtools-notice-card {
+  background: #0d1110;
+  border: 1px solid #1f2924;
+  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.8);
+}
+
+.devtools-notice-badge {
+  color: #00f57a;
+  background: rgba(0, 245, 122, 0.08);
+  border: 1px solid rgba(0, 245, 122, 0.25);
+}
+
+.devtools-notice-cta {
+  background: #00f57a;
+  color: #030504;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.devtools-notice-cta:hover {
+  filter: brightness(1.08);
+}
+
+.devtools-notice-cta:active {
+  transform: scale(0.98);
+}
+
+.devtools-notice-cta:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.devtools-notice-footer {
+  border-top: 1px solid #1f2924;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .devtools-notice-cta {
+    transition: none;
+  }
+}
+
 /* Landing-specific */
 .landing-hero-glow {
   background:
