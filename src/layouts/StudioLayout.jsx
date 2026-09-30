@@ -13,10 +13,11 @@ import {
   Bot,
   Wallet,
 } from 'lucide-react';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
-
+import LoadingState from '../components/LoadingState.jsx';
+import MobileBottomNav from '../components/MobileBottomNav.jsx';
 
 
 const nav = [
@@ -167,10 +168,14 @@ export default function StudioLayout() {
           </div>
         </header>
 
-        <main className="flex-1 min-w-0 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-6xl w-full mx-auto">
-          <Outlet />
+        <main className="flex-1 min-w-0 px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-[calc(1.5rem+var(--bottom-nav-offset))] sm:pb-[calc(2rem+var(--bottom-nav-offset))] max-w-6xl w-full mx-auto">
+          <Suspense fallback={<LoadingState />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
+
+      <MobileBottomNav />
     </div>
   );
 }

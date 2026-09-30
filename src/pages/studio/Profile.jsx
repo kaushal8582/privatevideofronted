@@ -1,16 +1,38 @@
 import { useEffect, useId, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Download, Link2, Plus, Trash2 } from 'lucide-react';
+import {
+  Bot,
+  ChevronRight,
+  Download,
+  Gift,
+  Link2,
+  LogOut,
+  MessageCircle,
+  Plus,
+  Sparkles,
+  Trash2,
+  Wallet,
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { getFriendlyError } from '../../services/api.js';
 import SocialPlatformIcon from '../../components/SocialPlatformIcon.jsx';
+import ThemeToggle from '../../components/ThemeToggle.jsx';
+import InstallAppCard from '../../pwa/InstallAppCard.jsx';
 import {
   MAX_SOCIAL_LINKS,
   detectSocialPlatform,
   normalizeSocialUrl,
 } from '../../utils/socialLinks.js';
 import { validateName } from '../../utils/validation.js';
+
+const MORE_LINKS = [
+  { to: '/studio/og-earn', label: 'OG Earn', icon: Sparkles },
+  { to: '/studio/payouts', label: 'Payouts', icon: Wallet },
+  { to: '/studio/referrals', label: 'Referrals', icon: Gift },
+  { to: '/studio/telegram', label: 'Telegram connect', icon: MessageCircle },
+  { to: '/studio/mp2mp-bot', label: 'MP2MP Bot', icon: Bot },
+];
 
 function emptyLink() {
   return { title: '', url: '', platform: 'link', _key: `${Date.now()}-${Math.random()}` };
@@ -335,6 +357,39 @@ export default function StudioProfile() {
           )}
         </section>
       </form>
+
+      <InstallAppCard />
+
+      <nav className="lg:hidden app-card overflow-hidden" aria-label="More">
+        <ul className="divide-y divide-[var(--border)]">
+          {MORE_LINKS.map(({ to, label, icon: Icon }) => (
+            <li key={to}>
+              <Link
+                to={to}
+                className="flex items-center gap-3 px-4 min-h-12 text-sm font-medium hover:bg-[var(--surface)]"
+              >
+                <Icon className="w-4 h-4 text-[var(--primary)] shrink-0" aria-hidden />
+                <span className="flex-1">{label}</span>
+                <ChevronRight className="w-4 h-4 app-muted" aria-hidden />
+              </Link>
+            </li>
+          ))}
+          <li className="flex items-center gap-3 px-4 min-h-12 text-sm font-medium">
+            <span className="flex-1">Theme</span>
+            <ThemeToggle />
+          </li>
+          <li>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex w-full items-center gap-3 px-4 min-h-12 text-sm font-medium text-[var(--danger)] hover:bg-[var(--danger-soft)]"
+            >
+              <LogOut className="w-4 h-4 shrink-0" aria-hidden />
+              Log out
+            </button>
+          </li>
+        </ul>
+      </nav>
     </div>
   );
 }

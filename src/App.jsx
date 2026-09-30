@@ -1,37 +1,45 @@
-import { Link, Navigate, Routes, Route, Outlet } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { Navigate, Routes, Route, Outlet } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 import Navbar from './components/Navbar.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import BackgroundUploadPanel from './components/BackgroundUploadPanel.jsx';
+import LoadingState from './components/LoadingState.jsx';
+import DevToolsNotice from './components/DevToolsNotice.jsx';
 import LandingFooter from './components/landing/LandingFooter.jsx';
 import StudioLayout from './layouts/StudioLayout.jsx';
 import Landing from './pages/Landing.jsx';
-import WatchVideo from './pages/WatchVideo.jsx';
-import PrivacyPolicy from './pages/PrivacyPolicy.jsx';
-import TermsOfService from './pages/TermsOfService.jsx';
-import DmcaPolicy from './pages/DmcaPolicy.jsx';
-import Contact from './pages/Contact.jsx';
-import Login from './pages/Login.jsx';
-import Register from './pages/Register.jsx';
-import VerifyEmail from './pages/VerifyEmail.jsx';
-import ForgotPassword from './pages/ForgotPassword.jsx';
-import NotFound from './pages/NotFound.jsx';
-import StudioOverview from './pages/studio/Overview.jsx';
-import StudioVideos from './pages/studio/Videos.jsx';
-import StudioUpload from './pages/studio/Upload.jsx';
-import StudioProfile from './pages/studio/Profile.jsx';
-import StudioReferrals from './pages/studio/Referrals.jsx';
-import StudioOgEarn from './pages/studio/OgEarn.jsx';
-import StudioTelegram from './pages/studio/Telegram.jsx';
-import StudioMp2mpBot from './pages/studio/Mp2mpBot.jsx';
-import StudioPayouts from './pages/studio/Payouts.jsx';
+import OfflineScreen from './pwa/OfflineScreen.jsx';
+import PwaUpdatePrompt from './pwa/PwaUpdatePrompt.jsx';
+
+const WatchVideo = lazy(() => import('./pages/WatchVideo.jsx'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy.jsx'));
+const TermsOfService = lazy(() => import('./pages/TermsOfService.jsx'));
+const DmcaPolicy = lazy(() => import('./pages/DmcaPolicy.jsx'));
+const Contact = lazy(() => import('./pages/Contact.jsx'));
+const Login = lazy(() => import('./pages/Login.jsx'));
+const Register = lazy(() => import('./pages/Register.jsx'));
+const VerifyEmail = lazy(() => import('./pages/VerifyEmail.jsx'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword.jsx'));
+const NotFound = lazy(() => import('./pages/NotFound.jsx'));
+const StudioOverview = lazy(() => import('./pages/studio/Overview.jsx'));
+const StudioVideos = lazy(() => import('./pages/studio/Videos.jsx'));
+const StudioUpload = lazy(() => import('./pages/studio/Upload.jsx'));
+const StudioProfile = lazy(() => import('./pages/studio/Profile.jsx'));
+const StudioReferrals = lazy(() => import('./pages/studio/Referrals.jsx'));
+const StudioOgEarn = lazy(() => import('./pages/studio/OgEarn.jsx'));
+const StudioTelegram = lazy(() => import('./pages/studio/Telegram.jsx'));
+const StudioMp2mpBot = lazy(() => import('./pages/studio/Mp2mpBot.jsx'));
+const StudioPayouts = lazy(() => import('./pages/studio/Payouts.jsx'));
 
 function MarketingShell() {
   return (
     <div className="app-shell min-h-screen flex flex-col overflow-x-clip">
       <Navbar />
       <main className="flex-1 w-full min-w-0">
-        <Outlet />
+        <Suspense fallback={<LoadingState />}>
+          <Outlet />
+        </Suspense>
       </main>
       <LandingFooter />
     </div>
@@ -80,6 +88,9 @@ export default function App() {
         </Route>
       </Routes>
       <BackgroundUploadPanel />
+      <PwaUpdatePrompt />
+      <OfflineScreen />
+      {import.meta.env.PROD && <DevToolsNotice />}
       <Analytics />
     </>
   );

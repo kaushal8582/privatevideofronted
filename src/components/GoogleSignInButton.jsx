@@ -109,7 +109,13 @@ export default function GoogleSignInButton({
   if (unavailable) {
     return (
       <p className="text-center text-xs app-muted px-1">
-        Google sign-in is not configured yet. Set <code>VITE_GOOGLE_CLIENT_ID</code>.
+        {import.meta.env.DEV ? (
+          <>
+            Google sign-in is not configured yet. Set <code>VITE_GOOGLE_CLIENT_ID</code>.
+          </>
+        ) : (
+          'Google sign-in is unavailable right now.'
+        )}
       </p>
     );
   }

@@ -40,16 +40,22 @@ api.interceptors.response.use(
   }
 );
 
-export const getFriendlyError = (error, fallback = 'Something went wrong.') => {
+export const getFriendlyError = (error, fallback = 'Something went wrong. Please try again.') => {
+  if (axios.isCancel(error) || error?.code === 'ERR_CANCELED') return 'Request cancelled.';
+  if (error?.code === 'ECONNABORTED' || error?.code === 'ETIMEDOUT') {
+    return 'The request timed out. Please try again.';
+  }
+  if (error?.isAxiosError && !error.response) {
+    return "Can't reach MastPlayer. Check your connection and try again.";
+  }
   const status = error?.response?.status;
-  if (status === 413) {
-    return 'File too large for the server proxy. Use chunked upload or raise client_max_body_size.';
-  }
   const data = error?.response?.data;
-  if (typeof data === 'string' && data.includes('413')) {
-    return 'File too large for the server proxy (413).';
+  if (status === 413 || (typeof data === 'string' && data.includes('413'))) {
+    return 'This file is too large to upload. Please choose a smaller file.';
   }
-  return data?.message || error?.message || fallback;
+  if (typeof data?.message === 'string' && data.message) return data.message;
+  if (error?.isAxiosError || (status && status >= 500)) return fallback;
+  return error?.message || fallback;
 };
 
 /** Machine-readable API error code (e.g. OTP_EXPIRED) — never parse messages. */

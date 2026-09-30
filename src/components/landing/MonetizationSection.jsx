@@ -39,7 +39,7 @@ export default function MonetizationSection() {
     >
       <Reveal>
         <h2 className="landing-heading text-center max-w-3xl mx-auto mb-3 sm:mb-4">
-          Turn Your Audience Into Opportunity
+          Turn Your Audience Into <span className="app-gradient-text">Opportunity</span>
         </h2>
         <p className="text-center text-sm text-[var(--muted)] max-w-2xl mx-auto mb-8 sm:mb-12 leading-relaxed px-1">
           A clear rate for creators — estimated earnings from qualified app views.

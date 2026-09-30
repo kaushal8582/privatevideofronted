@@ -12,6 +12,7 @@ import { deleteVideo, fetchDashboardStats, getFriendlyError } from '../../servic
 import DeleteVideoModal from '../../components/DeleteVideoModal.jsx';
 import TelegramReshareModal from '../../components/TelegramReshareModal.jsx';
 import VideoActionsMenu from '../../components/VideoActionsMenu.jsx';
+import InstallAppCard from '../../pwa/InstallAppCard.jsx';
 import { formatCount, formatDate, formatDuration, formatUsd } from '../../utils/formatters.js';
 
 function StatCard({ icon: Icon, label, value, hint, accent = 'green' }) {
@@ -104,6 +105,8 @@ export default function StudioOverview() {
           Upload video
         </Link>
       </div>
+
+      <InstallAppCard dismissible />
 
       {loading && (
         <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">

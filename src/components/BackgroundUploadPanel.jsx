@@ -15,7 +15,7 @@ export default function BackgroundUploadPanel() {
   if (job.status === 'idle') return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-[min(100vw-2rem,22rem)] rounded-2xl border border-[var(--border-green)] bg-[var(--surface-elevated)]/95 backdrop-blur shadow-[0_16px_48px_-16px_rgba(0,0,0,0.6)] overflow-hidden">
+    <div className="fixed bottom-[calc(1rem+var(--bottom-nav-offset))] right-4 z-50 w-[min(100vw-2rem,22rem)] rounded-2xl border border-[var(--border-green)] bg-[var(--surface-elevated)]/95 backdrop-blur shadow-[0_16px_48px_-16px_rgba(0,0,0,0.6)] overflow-hidden">
       <div className="flex items-start gap-3 px-4 pt-4 pb-2">
         <div className="mt-0.5 shrink-0 w-9 h-9 rounded-xl bg-[var(--accent-medium)] text-[var(--primary)] flex items-center justify-center">
           {job.status === 'uploading' && <Loader2 className="w-4 h-4 animate-spin" />}

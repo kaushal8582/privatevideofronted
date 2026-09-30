@@ -14,7 +14,7 @@ export default function HowItWorks() {
     <SectionShell id="how-it-works" className="py-12 sm:py-16 lg:py-24">
       <Reveal>
         <h2 className="landing-heading text-center max-w-3xl mx-auto mb-10 sm:mb-14">
-          From Video to Shareable Link in Seconds
+          From Video to <span className="app-gradient-text">Shareable Link</span> in Seconds
         </h2>
       </Reveal>
 

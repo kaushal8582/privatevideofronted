@@ -122,14 +122,15 @@ async function uploadPart(url, blob, signal) {
   });
 
   if (!res.ok) {
-    throw new Error(`Chunk upload failed (${res.status})`);
+    throw new Error('Upload was interrupted. Please try again.');
   }
 
   const etag = res.headers.get('etag') || res.headers.get('ETag');
   if (!etag) {
-    throw new Error(
-      'Missing ETag from storage. Configure R2 CORS to ExposeHeaders: ETag.'
-    );
+    if (import.meta.env.DEV) {
+      console.warn('Missing ETag from storage. Configure R2 CORS to ExposeHeaders: ETag.');
+    }
+    throw new Error('Storage did not confirm the upload. Please try again.');
   }
 
   return etag;
@@ -251,10 +252,10 @@ export async function uploadVideoChunked(file, onProgress, signal, options = {})
       throw err;
     }
 
-    const message = getFriendlyError(
-      err,
-      err?.message || 'Chunked upload failed. Check R2 CORS (PUT + Expose ETag).'
-    );
+    const message =
+      err instanceof TypeError
+        ? 'Upload connection failed. Check your connection and try again.'
+        : getFriendlyError(err, 'Video upload failed. Please try again.');
     const wrapped = new Error(message);
     wrapped.cause = err;
     throw wrapped;

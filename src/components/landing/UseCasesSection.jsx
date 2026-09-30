@@ -25,7 +25,8 @@ export default function UseCasesSection() {
     <SectionShell id="use-cases" className="py-12 sm:py-16 lg:py-24">
       <Reveal>
         <h2 className="landing-heading text-center mb-8 sm:mb-12">
-          Real Ways Creators Use MastPlayer
+          Real Ways <span className="app-gradient-text">Creators</span> Use{' '}
+          <span className="app-gradient-text">MastPlayer</span>
         </h2>
       </Reveal>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">

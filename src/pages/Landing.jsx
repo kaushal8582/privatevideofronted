@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
+import { isStandalone } from '../pwa/installPrompt.js';
 import LandingNavbar from '../components/landing/LandingNavbar.jsx';
 import LandingFooter from '../components/landing/LandingFooter.jsx';
 import HeroSection from '../components/landing/HeroSection.jsx';
@@ -19,6 +21,7 @@ import FinalCTA from '../components/landing/FinalCTA.jsx';
 
 export default function Landing() {
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const hash = location.hash?.replace(/^#/, '');
@@ -28,6 +31,10 @@ export default function Landing() {
     }, 80);
     return () => window.clearTimeout(t);
   }, [location.hash, location.pathname]);
+
+  if (isAuthenticated && !location.hash && isStandalone()) {
+    return <Navigate to="/studio" replace />;
+  }
 
   return (
     <div className="landing-page min-h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)] overflow-x-clip">

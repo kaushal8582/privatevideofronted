@@ -44,9 +44,9 @@ export default function AnalyticsSection() {
           </div>
 
           <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
-            <div className="lg:col-span-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 sm:p-4 min-w-0">
+            <div className="lg:col-span-2 flex flex-col rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 sm:p-4 min-w-0">
               <p className="text-xs font-semibold text-[var(--muted)] mb-3 sm:mb-4">Views Over Time</p>
-              <div className="flex items-end gap-1 sm:gap-1.5 h-28 sm:h-32" role="img" aria-label="Sample views chart">
+              <div className="mt-auto flex items-end gap-1 sm:gap-1.5 h-28 sm:h-32 lg:h-44" role="img" aria-label="Sample views chart">
                 {CHART.map((h, i) => (
                   <div
                     key={i}

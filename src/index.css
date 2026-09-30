@@ -164,6 +164,8 @@ body {
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.2s ease, color 0.2s ease;
   overflow-x: clip;
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 
 #root {
@@ -543,6 +545,119 @@ body {
   background: var(--nav-backdrop);
   backdrop-filter: blur(12px);
   box-shadow: 0 8px 32px -12px var(--nav-shadow);
+}
+
+/* Mobile bottom navigation (studio, < lg). --bottom-nav-offset lets fixed/sticky UI sit above it. */
+:root {
+  --bottom-nav-height: 4rem;
+  --bottom-nav-offset: 0px;
+}
+
+@media (max-width: 1023.98px) {
+  html.has-bottom-nav:not(.keyboard-open) {
+    --bottom-nav-offset: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+.mobile-bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  background: var(--nav-backdrop);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  transition: transform 0.2s ease;
+}
+
+.mobile-bottom-nav[data-hidden] {
+  transform: translateY(100%);
+  pointer-events: none;
+}
+
+.mobile-bottom-nav-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  width: 100%;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--muted);
+  font-weight: 500;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s ease;
+}
+
+.mobile-bottom-nav-item[data-active] {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.mobile-bottom-nav-item[data-active] > span:last-child {
+  color: var(--foreground);
+}
+
+.mobile-bottom-nav-item:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -4px;
+  border-radius: 0.75rem;
+}
+
+.mobile-bottom-nav-indicator {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1.5rem;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: var(--gradient-brand-h);
+  transform: translateX(-50%) scaleX(0);
+  transition: transform 0.2s ease;
+}
+
+.mobile-bottom-nav-item[data-active] .mobile-bottom-nav-indicator {
+  transform: translateX(-50%) scaleX(1);
+}
+
+.mobile-bottom-nav-fab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  margin-top: -1.5rem;
+  border-radius: 9999px;
+  background: var(--gradient-brand);
+  color: #ffffff;
+  box-shadow:
+    0 0 0 4px var(--background),
+    0 8px 20px -6px var(--glow-cyan);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.mobile-bottom-nav-item:active .mobile-bottom-nav-fab {
+  transform: scale(0.94);
+}
+
+.mobile-bottom-nav-fab[data-active] {
+  filter: brightness(1.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-bottom-nav,
+  .mobile-bottom-nav-item,
+  .mobile-bottom-nav-indicator,
+  .mobile-bottom-nav-fab {
+    transition: none;
+  }
 }
 
 /* Landing-specific */

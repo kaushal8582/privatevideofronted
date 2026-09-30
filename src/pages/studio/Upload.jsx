@@ -433,7 +433,7 @@ export default function StudioUpload() {
           {job.status === 'error' && job.error && <p className="app-error">{job.error}</p>}
 
           {file && !isUploading && (
-            <div className="sticky bottom-3 z-10">
+            <div className="sticky bottom-[calc(0.75rem+var(--bottom-nav-offset))] z-10">
               <div className="app-card flex flex-wrap items-center justify-between gap-3 px-4 py-3 shadow-lg border-[var(--border-accent)]">
                 <p className="text-sm app-muted min-w-0 truncate">
                   Ready ·{' '}

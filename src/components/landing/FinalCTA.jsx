@@ -19,7 +19,7 @@ export default function FinalCTA() {
             <div className="pointer-events-none absolute inset-0 landing-cta-glow" aria-hidden />
             <div className="relative min-w-0">
               <h2 className="landing-heading mb-3 sm:mb-4">
-                Ready to Share Your First Video?
+                Ready to Share <span className="app-gradient-text">Your First</span> Video?
               </h2>
               <p className="text-sm sm:text-base text-[var(--muted)] max-w-xl mx-auto mb-6 sm:mb-8 leading-relaxed">
                 Upload your content, generate your MastPlayer link and start sharing.

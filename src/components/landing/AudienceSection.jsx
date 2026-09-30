@@ -15,7 +15,7 @@ export default function AudienceSection() {
     <SectionShell id="audience" className="py-12 sm:py-16 lg:py-24">
       <Reveal>
         <h2 className="landing-heading text-center mb-8 sm:mb-12">
-          Built for Every Kind of Creator
+          Built for Every Kind of <span className="app-gradient-text">Creator</span>
         </h2>
       </Reveal>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
