@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { fetchVideos, deleteVideo as apiDeleteVideo, getFriendlyError } from '../services/api.js';
 
 export default function useVideos({ page = 1, limit = 20, autoLoad = true } = {}) {
@@ -13,18 +13,23 @@ export default function useVideos({ page = 1, limit = 20, autoLoad = true } = {}
   const [error, setError] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
 
+  const requestIdRef = useRef(0);
+
   const loadVideos = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
     setLoading(true);
     setError(null);
     try {
       const { data } = await fetchVideos(page, limit);
+      if (requestId !== requestIdRef.current) return;
       setVideos(data.data.videos || []);
       setPagination(data.data.pagination || { page, limit, total: 0, totalPages: 1 });
     } catch (err) {
+      if (requestId !== requestIdRef.current) return;
       setError(getFriendlyError(err, 'Unable to load videos.'));
       setVideos([]);
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) setLoading(false);
     }
   }, [page, limit]);
 

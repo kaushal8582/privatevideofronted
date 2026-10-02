@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Upload, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
 import useVideos from '../../hooks/useVideos.js';
@@ -10,6 +10,7 @@ import DeleteVideoModal from '../../components/DeleteVideoModal.jsx';
 import TelegramReshareModal from '../../components/TelegramReshareModal.jsx';
 import VideoActionsMenu from '../../components/VideoActionsMenu.jsx';
 import VideoThumbnail from '../../components/VideoThumbnail.jsx';
+import Pagination from '../../components/Pagination.jsx';
 import {
   formatCount,
   formatDate,
@@ -17,21 +18,51 @@ import {
   formatFileSize,
 } from '../../utils/formatters.js';
 
+const PAGE_SIZE = 20;
+
 export default function StudioVideos() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = Math.max(1, parseInt(searchParams.get('page'), 10) || 1);
+
   const { videos, pagination, loading, error, deletingId, reload, removeVideo } =
-    useVideos({ page: 1, limit: 60 });
+    useVideos({ page, limit: PAGE_SIZE });
 
   const [pendingDelete, setPendingDelete] = useState(null);
   const [reshareVideo, setReshareVideo] = useState(null);
 
+  const initialLoading = loading && videos.length === 0;
+  const totalPages = pagination.totalPages || 1;
+
+  const goToPage = useCallback(
+    (next, { replace = false } = {}) => {
+      const params = new URLSearchParams(searchParams);
+      if (next <= 1) params.delete('page');
+      else params.set('page', String(next));
+      setSearchParams(params, { replace });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    [searchParams, setSearchParams]
+  );
+
+  // Out-of-range ?page= (e.g. old link, or videos deleted elsewhere) → jump to the last page.
+  useEffect(() => {
+    if (loading || error) return;
+    if (page > totalPages && pagination.total > 0) {
+      goToPage(totalPages, { replace: true });
+    }
+  }, [loading, error, page, totalPages, pagination.total, goToPage]);
+
   const handleConfirmDelete = async () => {
     if (!pendingDelete) return;
     const id = pendingDelete.id || pendingDelete._id;
+    const wasLastOnPage = videos.length === 1;
     const result = await removeVideo(id);
 
     if (result.success) {
       toast.success('Video deleted');
       setPendingDelete(null);
+      if (wasLastOnPage && page > 1) goToPage(page - 1, { replace: true });
+      else reload();
     } else {
       toast.error(result.message || 'Failed to delete video.');
     }
@@ -51,7 +82,7 @@ export default function StudioVideos() {
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
           <h1 className="app-title">Videos</h1>
-          {!loading && !error && (
+          {!initialLoading && !error && (
             <p className="app-subtitle mt-2">
               {pagination.total} {pagination.total === 1 ? 'video' : 'videos'} · app views shown
             </p>
@@ -63,16 +94,20 @@ export default function StudioVideos() {
         </Link>
       </div>
 
-      {loading && <SkeletonGrid />}
+      {initialLoading && <SkeletonGrid />}
 
       {!loading && error && (
         <ErrorState title="Unable to load videos" message={error} onRetry={reload} />
       )}
 
-      {!loading && !error && videos.length === 0 && <EmptyState />}
+      {!loading && !error && videos.length === 0 && pagination.total === 0 && <EmptyState />}
 
-      {!loading && !error && videos.length > 0 && (
-        <div className="app-table-wrap min-w-0 max-w-full">
+      {!error && videos.length > 0 && (
+        <div
+          className={`app-table-wrap min-w-0 max-w-full transition-opacity ${
+            loading ? 'opacity-60 pointer-events-none' : ''
+          }`}
+          aria-busy={loading}>
           <div className="overflow-x-auto overscroll-x-contain">
             <table className="app-table min-w-[640px]">
               <thead>
@@ -136,6 +171,18 @@ export default function StudioVideos() {
             </table>
           </div>
         </div>
+      )}
+
+      {!error && videos.length > 0 && (
+        <Pagination
+          page={pagination.page || page}
+          totalPages={totalPages}
+          total={pagination.total}
+          limit={pagination.limit || PAGE_SIZE}
+          onPageChange={goToPage}
+          disabled={loading}
+          label={pagination.total === 1 ? 'video' : 'videos'}
+        />
       )}
 
       <DeleteVideoModal
