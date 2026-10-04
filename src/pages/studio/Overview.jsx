@@ -12,6 +12,7 @@ import { deleteVideo, fetchDashboardStats, getFriendlyError } from '../../servic
 import DeleteVideoModal from '../../components/DeleteVideoModal.jsx';
 import TelegramReshareModal from '../../components/TelegramReshareModal.jsx';
 import VideoActionsMenu from '../../components/VideoActionsMenu.jsx';
+import TelegramChannelCard from '../../components/TelegramChannelCard.jsx';
 import InstallAppCard from '../../pwa/InstallAppCard.jsx';
 import { formatCount, formatDate, formatDuration, formatUsd } from '../../utils/formatters.js';
 
@@ -105,6 +106,8 @@ export default function StudioOverview() {
           Upload video
         </Link>
       </div>
+
+      <TelegramChannelCard />
 
       <InstallAppCard dismissible />
 
