@@ -181,11 +181,11 @@ export default function WatchVideo() {
     <>
       <div className="max-w-3xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="min-w-0">
-          <p className="app-kicker uppercase tracking-widest mb-2">Shared video</p>
-          <h1 className="text-2xl sm:text-3xl font-semibold break-words leading-tight">
+          {/* <p className="app-kicker uppercase tracking-widest mb-2">Shared videos</p> */}
+          <h1 className="text-xl sm:text-3xl font-semibold break-words leading-tight">
             {video.title}
           </h1>
-          <p className="text-sm app-muted mt-1 truncate">{video.originalName}</p>
+          {/* <p className="text-sm app-muted mt-1 truncate">{video.originalName}</p> */}
           {video.ogEarn?.isRemapped ? (
             <p className="mt-2 text-xs font-semibold text-[var(--blue)]">OG Earn remapped link</p>
           ) : null}
@@ -227,7 +227,7 @@ export default function WatchVideo() {
           ) : null}
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        {/* <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
             onClick={openInApp}
@@ -241,7 +241,7 @@ export default function WatchVideo() {
             Get Mast Player
           </a>
           <CopyLinkButton url={shareUrl} variant="secondary" />
-        </div>
+        </div> */}
 
         {showOgEarn && (
           <div className="app-card-padded space-y-3">
@@ -289,7 +289,7 @@ export default function WatchVideo() {
           </div>
         )}
 
-        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm app-muted">
+        {/* <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm app-muted">
           <span className="inline-flex items-center gap-1.5">
             <HardDrive className="w-4 h-4" />
             {formatFileSize(video.size)}
@@ -299,7 +299,7 @@ export default function WatchVideo() {
             <Calendar className="w-4 h-4" />
             {formatDate(video.createdAt)}
           </span>
-        </div>
+        </div> */}
       </div>
 
       <WatchEarnTeaser />
