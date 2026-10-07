@@ -8,7 +8,12 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { deleteVideo, fetchDashboardStats, getFriendlyError } from '../../services/api.js';
+import {
+  deleteVideo,
+  fetchDashboardActivity,
+  fetchDashboardStats,
+  getFriendlyError,
+} from '../../services/api.js';
 import DeleteVideoModal from '../../components/DeleteVideoModal.jsx';
 import TelegramReshareModal from '../../components/TelegramReshareModal.jsx';
 import VideoActionsMenu from '../../components/VideoActionsMenu.jsx';
@@ -42,6 +47,68 @@ function StatCard({ icon: Icon, label, value, hint, accent = 'green' }) {
   );
 }
 
+function formatActivityDay(isoDate) {
+  const date = new Date(`${isoDate}T12:00:00+05:30`);
+  if (Number.isNaN(date.getTime())) return isoDate;
+  const today = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+  if (isoDate === today) return 'Today';
+  return date.toLocaleDateString('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    day: 'numeric',
+    month: 'short',
+  });
+}
+
+function DailyActivity({ activity, error }) {
+  return (
+    <section className="app-table-wrap">
+      <div className="px-5 sm:px-6 py-4 border-b border-[var(--border)]">
+        <h2 className="text-lg font-semibold text-[var(--foreground)]">Daily activity</h2>
+        <p className="text-sm app-muted">Uploads and earnings for the last 14 days (India time)</p>
+      </div>
+      {error ? (
+        <div className="p-5">
+          <p className="app-error">{error}</p>
+        </div>
+      ) : !activity ? (
+        <div className="p-5 space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-8 rounded-lg bg-[var(--surface)] animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="app-table min-w-[320px]">
+            <thead>
+              <tr>
+                <th className="px-5">Day</th>
+                <th>Uploads</th>
+                <th className="px-5 text-right">Earnings</th>
+              </tr>
+            </thead>
+            <tbody>
+              {activity.activity.map((row) => (
+                <tr key={row.date}>
+                  <td className="px-5">{formatActivityDay(row.date)}</td>
+                  <td className="tabular-nums">{formatCount(row.uploads)}</td>
+                  <td className="px-5 text-right tabular-nums font-medium">
+                    {formatUsd(row.earningsUsd)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default function StudioOverview() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -49,6 +116,8 @@ export default function StudioOverview() {
   const [pendingDelete, setPendingDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [reshareVideo, setReshareVideo] = useState(null);
+  const [activity, setActivity] = useState(null);
+  const [activityError, setActivityError] = useState(null);
 
   const loadStats = useCallback(async ({ silent = false, isCancelled = () => false } = {}) => {
     if (!silent) setLoading(true);
@@ -66,6 +135,13 @@ export default function StudioOverview() {
   useEffect(() => {
     let cancelled = false;
     loadStats({ isCancelled: () => cancelled });
+    fetchDashboardActivity(14)
+      .then(({ data }) => {
+        if (!cancelled) setActivity(data.data);
+      })
+      .catch((err) => {
+        if (!cancelled) setActivityError(getFriendlyError(err, 'Could not load daily activity.'));
+      });
     return () => {
       cancelled = true;
     };
@@ -145,6 +221,8 @@ export default function StudioOverview() {
               accent="amber"
             />
           </div>
+
+          <DailyActivity activity={activity} error={activityError} />
 
           <section className="app-table-wrap">
             <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-[var(--border)]">

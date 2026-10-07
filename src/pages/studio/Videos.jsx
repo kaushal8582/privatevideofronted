@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Upload, Eye } from 'lucide-react';
+import { Upload, Eye, Send, Loader, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import useVideos from '../../hooks/useVideos.js';
 import EmptyState from '../../components/EmptyState.jsx';
@@ -17,6 +17,7 @@ import {
   formatDuration,
   formatFileSize,
 } from '../../utils/formatters.js';
+import { getFriendlyError, reshareVideosToAllTelegram } from '../../services/api.js';
 
 const PAGE_SIZE = 20;
 
@@ -29,6 +30,15 @@ export default function StudioVideos() {
 
   const [pendingDelete, setPendingDelete] = useState(null);
   const [reshareVideo, setReshareVideo] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [bulkPosting, setBulkPosting] = useState(false);
+
+  const readyIds = videos
+    .filter((video) => (video.status || 'ready') === 'ready')
+    .map((video) => video.id || video._id);
+  const selectedOnPage = readyIds.filter((id) => selectedIds.includes(id));
+  const allReadySelected = readyIds.length > 0 && selectedOnPage.length === readyIds.length;
 
   const initialLoading = loading && videos.length === 0;
   const totalPages = pagination.totalPages || 1;
@@ -51,6 +61,39 @@ export default function StudioVideos() {
       goToPage(totalPages, { replace: true });
     }
   }, [loading, error, page, totalPages, pagination.total, goToPage]);
+
+  useEffect(() => {
+    setSelectedIds([]);
+    setBulkOpen(false);
+  }, [page]);
+
+  const toggleSelected = (id) => {
+    setSelectedIds((current) =>
+      current.includes(id) ? current.filter((item) => item !== id) : [...current, id]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    setSelectedIds(allReadySelected ? [] : readyIds);
+  };
+
+  const handleBulkReshare = async () => {
+    if (bulkPosting || selectedIds.length === 0) return;
+    setBulkPosting(true);
+    try {
+      const { data } = await reshareVideosToAllTelegram(selectedIds);
+      if (data.success) toast.success(data.message || 'Re-share started');
+      else toast.error(data.message || 'Could not re-share these videos.');
+      if (data.success) {
+        setSelectedIds([]);
+        setBulkOpen(false);
+      }
+    } catch (err) {
+      toast.error(getFriendlyError(err, 'Could not re-share these videos.'));
+    } finally {
+      setBulkPosting(false);
+    }
+  };
 
   const handleConfirmDelete = async () => {
     if (!pendingDelete) return;
@@ -112,7 +155,17 @@ export default function StudioVideos() {
             <table className="app-table min-w-[640px]">
               <thead>
                 <tr>
-                  <th className="px-5">Video</th>
+                  <th className="px-5 w-10">
+                    <input
+                      type="checkbox"
+                      checked={allReadySelected}
+                      onChange={toggleSelectAll}
+                      disabled={readyIds.length === 0 || loading}
+                      aria-label="Select all ready videos on this page"
+                      className="h-4 w-4 accent-[var(--primary)]"
+                    />
+                  </th>
+                  <th>Video</th>
                   <th>
                     <span className="inline-flex items-center gap-1">
                       <Eye className="w-3.5 h-3.5" /> Views
@@ -127,9 +180,21 @@ export default function StudioVideos() {
                 {videos.map((video) => {
                   const id = video.id || video._id;
                   const deleting = deletingId === id;
+                  const ready = (video.status || 'ready') === 'ready';
+                  const selected = selectedIds.includes(id);
                   return (
                     <tr key={id}>
                       <td className="px-5">
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          disabled={!ready || deleting}
+                          onChange={() => toggleSelected(id)}
+                          aria-label={`Select ${video.title}`}
+                          className="h-4 w-4 accent-[var(--primary)] disabled:opacity-40"
+                        />
+                      </td>
+                      <td>
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="w-20 h-12 rounded-lg overflow-hidden bg-[var(--surface)] border border-[var(--border)] shrink-0 relative">
                             <VideoThumbnail
@@ -194,6 +259,92 @@ export default function StudioVideos() {
       />
 
       <TelegramReshareModal video={reshareVideo} onClose={() => setReshareVideo(null)} />
+
+      {selectedIds.length > 0 && (
+        <div
+          className="fixed inset-x-0 z-40 px-4"
+          style={{ bottom: 'calc(12px + var(--bottom-nav-offset))' }}
+        >
+          <div className="max-w-3xl mx-auto app-card border border-[var(--border)] shadow-lg p-3 flex flex-col sm:flex-row sm:items-center gap-3">
+            <p className="text-sm font-medium flex-1">
+              {selectedIds.length} {selectedIds.length === 1 ? 'video' : 'videos'} selected
+            </p>
+            <div className="flex gap-2">
+              <button type="button" className="app-btn-secondary" onClick={() => setSelectedIds([])}>
+                Clear
+              </button>
+              <button type="button" className="app-btn-primary" onClick={() => setBulkOpen(true)}>
+                <Send className="w-4 h-4" />
+                Re-share to all groups & channels
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {bulkOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="bulk-reshare-title"
+        >
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"
+            aria-label="Close dialog"
+            onClick={bulkPosting ? undefined : () => setBulkOpen(false)}
+          />
+          <div className="relative w-full max-w-md rounded-2xl app-card p-6 shadow-xl border-[var(--border)]">
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div className="w-11 h-11 rounded-xl bg-[var(--accent-soft)] text-[var(--primary)] flex items-center justify-center">
+                <Send className="w-5 h-5" />
+              </div>
+              <button
+                type="button"
+                onClick={() => setBulkOpen(false)}
+                disabled={bulkPosting}
+                className="p-2 rounded-lg app-muted hover:text-[var(--foreground)] hover:bg-[var(--surface)] disabled:opacity-50"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <h2 id="bulk-reshare-title" className="text-xl font-semibold mb-2">
+              Re-share {selectedIds.length} {selectedIds.length === 1 ? 'video' : 'videos'}?
+            </h2>
+            <p className="app-muted mb-6">
+              Each selected video will be posted again to every connected Telegram group and channel.
+              This keeps running after you close this dialog.
+            </p>
+            <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setBulkOpen(false)}
+                disabled={bulkPosting}
+                className="app-btn-secondary"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleBulkReshare}
+                disabled={bulkPosting}
+                className="app-btn-primary"
+              >
+                {bulkPosting ? (
+                  <>
+                    <Loader className="w-4 h-4 animate-spin" />
+                    Starting…
+                  </>
+                ) : (
+                  'Post to all'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
