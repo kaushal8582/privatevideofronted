@@ -89,7 +89,7 @@ export const updateMe = (payload) => api.patch('/auth/me', payload);
 
 export const fetchDashboardStats = () => api.get('/dashboard/stats');
 
-export const fetchDashboardActivity = (days = 14) =>
+export const fetchDashboardActivity = (days = 5) =>
   api.get('/dashboard/activity', { params: { days } });
 
 export const fetchReferralSummary = () => api.get('/referrals/me');
@@ -125,8 +125,8 @@ export const retryTelegramPublication = (id) =>
 export const reshareVideoToTelegram = (videoId, destinationIds) =>
   api.post(`/telegram/videos/${videoId}/reshare`, { destinationIds });
 
-export const reshareVideosToAllTelegram = (videoIds) =>
-  api.post('/telegram/videos/reshare-bulk', { videoIds });
+export const reshareVideosToAllTelegram = (videoIds, destinationIds) =>
+  api.post('/telegram/videos/reshare-bulk', { videoIds, destinationIds });
 
 /** MP2MP Link Converter Bot */
 export const fetchMp2mpStatus = () => api.get('/telegram/mp2mp/status');

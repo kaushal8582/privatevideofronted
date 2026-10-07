@@ -69,7 +69,7 @@ function DailyActivity({ activity, error }) {
     <section className="app-table-wrap">
       <div className="px-5 sm:px-6 py-4 border-b border-[var(--border)]">
         <h2 className="text-lg font-semibold text-[var(--foreground)]">Daily activity</h2>
-        <p className="text-sm app-muted">Uploads and earnings for the last 14 days (India time)</p>
+        <p className="text-sm app-muted">Uploads and earnings from today back 5 days (India time)</p>
       </div>
       {error ? (
         <div className="p-5">
@@ -135,7 +135,7 @@ export default function StudioOverview() {
   useEffect(() => {
     let cancelled = false;
     loadStats({ isCancelled: () => cancelled });
-    fetchDashboardActivity(14)
+    fetchDashboardActivity(5)
       .then(({ data }) => {
         if (!cancelled) setActivity(data.data);
       })

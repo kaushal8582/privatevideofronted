@@ -7,6 +7,7 @@ import {
   fetchTelegramPublications,
   getFriendlyError,
   reshareVideoToTelegram,
+  reshareVideosToAllTelegram,
 } from '../services/api.js';
 
 function formatMembers(n) {
@@ -17,8 +18,11 @@ function formatMembers(n) {
   return `${v} members`;
 }
 
-export default function TelegramReshareModal({ video, onClose }) {
-  const videoId = video ? video.id || video._id : null;
+export default function TelegramReshareModal({ video = null, videos = null, onClose, onDone }) {
+  const bulkList = Array.isArray(videos) ? videos.filter(Boolean) : [];
+  const isBulk = bulkList.length > 0;
+  const videoId = !isBulk && video ? video.id || video._id : null;
+  const open = isBulk || Boolean(videoId);
   const [destinations, setDestinations] = useState([]);
   const [postedIds, setPostedIds] = useState(new Set());
   const [selectedIds, setSelectedIds] = useState([]);
@@ -28,18 +32,17 @@ export default function TelegramReshareModal({ video, onClose }) {
   const [results, setResults] = useState(null);
 
   useEffect(() => {
-    if (!videoId) return undefined;
+    if (!open) return undefined;
     let cancelled = false;
     setLoading(true);
     setLoadError(null);
     setSelectedIds([]);
     setResults(null);
+    setPostedIds(new Set());
     (async () => {
       try {
-        const [destRes, pubRes] = await Promise.all([
-          fetchTelegramDestinations(),
-          fetchTelegramPublications(videoId).catch(() => null),
-        ]);
+        const destRes = await fetchTelegramDestinations();
+        const pubRes = isBulk ? null : await fetchTelegramPublications(videoId).catch(() => null);
         if (cancelled) return;
         setDestinations((destRes.data.data || []).filter((d) => d.isActive));
         const posted = new Set(
@@ -57,9 +60,9 @@ export default function TelegramReshareModal({ video, onClose }) {
     return () => {
       cancelled = true;
     };
-  }, [videoId]);
+  }, [open, isBulk, videoId]);
 
-  if (!video) return null;
+  if (!open) return null;
 
   const close = () => {
     if (!posting) onClose();
@@ -79,6 +82,19 @@ export default function TelegramReshareModal({ video, onClose }) {
     setPosting(true);
     setResults(null);
     try {
+      if (isBulk) {
+        const ids = bulkList.map((item) => item.id || item._id);
+        const { data } = await reshareVideosToAllTelegram(ids, selectedIds);
+        if (data.success) {
+          toast.success(data.message || 'Re-share started');
+          onDone?.();
+          onClose();
+        } else {
+          toast.error(data.message || 'Could not re-share these videos.');
+        }
+        return;
+      }
+
       const { data } = await reshareVideoToTelegram(videoId, selectedIds);
       const payload = data.data || {};
       setResults(payload.results || []);
@@ -146,10 +162,12 @@ export default function TelegramReshareModal({ video, onClose }) {
         </div>
 
         <h2 id="reshare-modal-title" className="text-xl font-semibold mb-1">
-          Re-share on Telegram
+          {isBulk
+            ? `Re-share ${bulkList.length} ${bulkList.length === 1 ? 'video' : 'videos'}`
+            : 'Re-share on Telegram'}
         </h2>
-        <p className="text-sm font-medium truncate mb-4" title={video.title}>
-          {video.title}
+        <p className="text-sm font-medium truncate mb-4" title={isBulk ? undefined : video.title}>
+          {isBulk ? 'Choose the Telegram groups and channels' : video.title}
         </p>
 
         <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1">

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Upload, Eye, Send, Loader, X } from 'lucide-react';
+import { Upload, Eye, Send } from 'lucide-react';
 import toast from 'react-hot-toast';
 import useVideos from '../../hooks/useVideos.js';
 import EmptyState from '../../components/EmptyState.jsx';
@@ -17,7 +17,6 @@ import {
   formatDuration,
   formatFileSize,
 } from '../../utils/formatters.js';
-import { getFriendlyError, reshareVideosToAllTelegram } from '../../services/api.js';
 
 const PAGE_SIZE = 20;
 
@@ -32,7 +31,6 @@ export default function StudioVideos() {
   const [reshareVideo, setReshareVideo] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
   const [bulkOpen, setBulkOpen] = useState(false);
-  const [bulkPosting, setBulkPosting] = useState(false);
 
   const readyIds = videos
     .filter((video) => (video.status || 'ready') === 'ready')
@@ -75,24 +73,6 @@ export default function StudioVideos() {
 
   const toggleSelectAll = () => {
     setSelectedIds(allReadySelected ? [] : readyIds);
-  };
-
-  const handleBulkReshare = async () => {
-    if (bulkPosting || selectedIds.length === 0) return;
-    setBulkPosting(true);
-    try {
-      const { data } = await reshareVideosToAllTelegram(selectedIds);
-      if (data.success) toast.success(data.message || 'Re-share started');
-      else toast.error(data.message || 'Could not re-share these videos.');
-      if (data.success) {
-        setSelectedIds([]);
-        setBulkOpen(false);
-      }
-    } catch (err) {
-      toast.error(getFriendlyError(err, 'Could not re-share these videos.'));
-    } finally {
-      setBulkPosting(false);
-    }
   };
 
   const handleConfirmDelete = async () => {
@@ -259,8 +239,17 @@ export default function StudioVideos() {
       />
 
       <TelegramReshareModal video={reshareVideo} onClose={() => setReshareVideo(null)} />
+      <TelegramReshareModal
+        videos={
+          bulkOpen
+            ? videos.filter((item) => selectedIds.includes(item.id || item._id))
+            : null
+        }
+        onClose={() => setBulkOpen(false)}
+        onDone={() => setSelectedIds([])}
+      />
 
-      {selectedIds.length > 0 && (
+      {selectedIds.length > 0 && !bulkOpen && (
         <div
           className="fixed inset-x-0 z-40 px-4"
           style={{ bottom: 'calc(12px + var(--bottom-nav-offset))' }}
@@ -275,71 +264,7 @@ export default function StudioVideos() {
               </button>
               <button type="button" className="app-btn-primary" onClick={() => setBulkOpen(true)}>
                 <Send className="w-4 h-4" />
-                Re-share to all groups & channels
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {bulkOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="bulk-reshare-title"
-        >
-          <button
-            type="button"
-            className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"
-            aria-label="Close dialog"
-            onClick={bulkPosting ? undefined : () => setBulkOpen(false)}
-          />
-          <div className="relative w-full max-w-md rounded-2xl app-card p-6 shadow-xl border-[var(--border)]">
-            <div className="flex items-start justify-between gap-3 mb-4">
-              <div className="w-11 h-11 rounded-xl bg-[var(--accent-soft)] text-[var(--primary)] flex items-center justify-center">
-                <Send className="w-5 h-5" />
-              </div>
-              <button
-                type="button"
-                onClick={() => setBulkOpen(false)}
-                disabled={bulkPosting}
-                className="p-2 rounded-lg app-muted hover:text-[var(--foreground)] hover:bg-[var(--surface)] disabled:opacity-50"
-                aria-label="Close"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <h2 id="bulk-reshare-title" className="text-xl font-semibold mb-2">
-              Re-share {selectedIds.length} {selectedIds.length === 1 ? 'video' : 'videos'}?
-            </h2>
-            <p className="app-muted mb-6">
-              Each selected video will be posted again to every connected Telegram group and channel.
-              This keeps running after you close this dialog.
-            </p>
-            <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-              <button
-                type="button"
-                onClick={() => setBulkOpen(false)}
-                disabled={bulkPosting}
-                className="app-btn-secondary"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleBulkReshare}
-                disabled={bulkPosting}
-                className="app-btn-primary"
-              >
-                {bulkPosting ? (
-                  <>
-                    <Loader className="w-4 h-4 animate-spin" />
-                    Starting…
-                  </>
-                ) : (
-                  'Post to all'
-                )}
+                Re-share on Telegram
               </button>
             </div>
           </div>
