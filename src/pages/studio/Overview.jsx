@@ -69,7 +69,9 @@ function DailyActivity({ activity, error }) {
     <section className="app-table-wrap">
       <div className="px-5 sm:px-6 py-4 border-b border-[var(--border)]">
         <h2 className="text-lg font-semibold text-[var(--foreground)]">Daily activity</h2>
-        <p className="text-sm app-muted">Uploads and earnings from today back 5 days (India time)</p>
+        <p className="text-sm app-muted">
+          Uploads, views, and earnings from today back 5 days (India time)
+        </p>
       </div>
       {error ? (
         <div className="p-5">
@@ -83,11 +85,12 @@ function DailyActivity({ activity, error }) {
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="app-table min-w-[320px]">
+          <table className="app-table min-w-[360px]">
             <thead>
               <tr>
                 <th className="px-5">Day</th>
                 <th>Uploads</th>
+                <th>Views</th>
                 <th className="px-5 text-right">Earnings</th>
               </tr>
             </thead>
@@ -96,6 +99,7 @@ function DailyActivity({ activity, error }) {
                 <tr key={row.date}>
                   <td className="px-5">{formatActivityDay(row.date)}</td>
                   <td className="tabular-nums">{formatCount(row.uploads)}</td>
+                  <td className="tabular-nums">{formatCount(row.views)}</td>
                   <td className="px-5 text-right tabular-nums font-medium">
                     {formatUsd(row.earningsUsd)}
                   </td>
